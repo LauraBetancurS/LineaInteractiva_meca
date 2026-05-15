@@ -1,0 +1,2482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciclo de Aseguramiento de la Calidad · MECA</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:#6B5CE7;
+  --purple-light:#EDE9FF;
+  --purple-mid:#C4B8FF;
+  --orange:#FF6B35;
+  --orange-light:#FFE8DF;
+  --lime:#D4FF4D;
+  --lime-dark:#9BC400;
+  --green:#00C97A;
+  --green-light:#CFFAEB;
+  --bg:#F0EEFF;
+  --bg2:#E8E2FF;
+  --white:#FFFFFF;
+  --dark:#2D2260;
+  --text:#3D3580;
+  --muted:#8F87C0;
+  --card-shadow:0 8px 32px rgba(107,92,231,.12);
+  --card-shadow-hover:0 16px 48px rgba(107,92,231,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+
+.view{display:none}.view.active{display:block}
+
+/* ═══ HERO ═══ */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:60px 24px;
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#fff 0%,var(--bg) 40%,var(--bg2) 100%);
+}
+/* floating blobs */
+.blob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;opacity:.5}
+.blob1{width:400px;height:400px;background:var(--purple-mid);top:-100px;left:-100px}
+.blob2{width:300px;height:300px;background:#C4F0FF;bottom:-80px;right:-60px}
+.blob3{width:200px;height:200px;background:var(--lime);top:30%;right:5%}
+
+.hero-logo{
+  display:flex;align-items:center;gap:8px;
+  background:var(--white);border-radius:20px;
+  padding:8px 20px;box-shadow:var(--card-shadow);
+  margin-bottom:32px;position:relative;z-index:1;
+}
+.hero-logo span{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--purple);letter-spacing:.5px}
+.logo-dot{width:8px;height:8px;background:var(--orange);border-radius:50%}
+
+.hero h1{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(2.4rem,5vw,3.8rem);
+  color:var(--dark);line-height:1.15;
+  margin-bottom:16px;position:relative;z-index:1;
+}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--purple),var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:1rem;color:var(--muted);font-weight:600;
+  max-width:440px;line-height:1.7;margin-bottom:40px;
+  position:relative;z-index:1;
+}
+
+/* Phase pills in hero */
+.hero-phases{
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+  margin-bottom:48px;position:relative;z-index:1;
+}
+.hpill{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:50px;
+  font-size:.82rem;font-weight:800;
+  box-shadow:0 4px 16px rgba(0,0,0,.08);
+  transition:transform .2s,box-shadow .2s;
+}
+.hpill:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.hpill.p1{background:var(--purple);color:#fff}
+.hpill.p2{background:var(--orange);color:#fff}
+.hpill.p3{background:var(--lime);color:var(--lime-dark)}
+.hpill.p4{background:var(--green);color:#fff}
+.hpill-ico{font-size:16px}
+
+.scroll-hint{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  position:relative;z-index:1;
+}
+.scroll-hint span{font-size:.72rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.scroll-ball{
+  width:40px;height:64px;border:2.5px solid var(--purple-mid);
+  border-radius:20px;display:flex;align-items:flex-start;justify-content:center;padding:6px;
+}
+.scroll-ball::after{
+  content:'';width:8px;height:8px;background:var(--purple);border-radius:50%;
+  animation:scrollDown 1.8s ease-in-out infinite;
+}
+@keyframes scrollDown{0%{transform:translateY(0);opacity:1}100%{transform:translateY(28px);opacity:0}}
+
+/* ═══ TIMELINE ═══ */
+.tl-section{
+  max-width:960px;margin:0 auto;
+  padding:40px 24px 100px;
+  position:relative;
+}
+
+/* Spine */
+.tl-spine{
+  position:absolute;left:50%;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,
+    transparent 0%,
+    var(--purple-mid) 5%,
+    var(--purple) 30%,
+    var(--orange) 60%,
+    var(--green) 90%,
+    transparent 100%);
+  transform:translateX(-50%);opacity:.35;
+  border-radius:2px;
+}
+
+/* ── ITEM ── */
+.tl-item{
+  display:grid;
+  grid-template-columns:1fr 80px 1fr;
+  align-items:center;
+  margin-bottom:72px;
+  opacity:0;
+  transition:opacity .65s ease,transform .65s ease;
+}
+.tl-item.from-left{transform:translateX(-50px)}
+.tl-item.from-right{transform:translateX(50px)}
+.tl-item.visible{opacity:1;transform:translateX(0)}
+
+/* Card */
+.tl-card{
+  background:var(--white);
+  border-radius:24px;
+  padding:28px 30px;
+  box-shadow:var(--card-shadow);
+  cursor:pointer;
+  transition:transform .25s,box-shadow .25s;
+  position:relative;overflow:hidden;
+}
+.tl-card:hover{transform:translateY(-5px);box-shadow:var(--card-shadow-hover)}
+
+/* Decorative circle inside card */
+.card-deco{
+  position:absolute;width:120px;height:120px;border-radius:50%;
+  opacity:.08;top:-30px;
+}
+.tl-item.p1 .card-deco{background:var(--purple);right:-20px}
+.tl-item.p2 .card-deco{background:var(--orange);left:-20px}
+.tl-item.p3 .card-deco{background:var(--lime-dark);right:-20px}
+.tl-item.p4 .card-deco{background:var(--green);left:-20px}
+
+.card-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-badge{
+  padding:4px 14px;border-radius:50px;
+  font-size:.67rem;font-weight:900;letter-spacing:.5px;text-transform:uppercase;
+}
+.tl-item.p1 .card-badge{background:var(--purple-light);color:var(--purple)}
+.tl-item.p2 .card-badge{background:var(--orange-light);color:var(--orange)}
+.tl-item.p3 .card-badge{background:#F5FFD0;color:var(--lime-dark)}
+.tl-item.p4 .card-badge{background:var(--green-light);color:#00915A}
+
+.card-sem{font-size:.7rem;font-weight:700;color:var(--muted)}
+
+.tl-card h2{
+  font-family:'Fredoka One',cursive;
+  font-size:1.8rem;color:var(--dark);
+  margin-bottom:8px;line-height:1.1;
+}
+.tl-item.p1 .tl-card h2{color:var(--purple)}
+.tl-item.p2 .tl-card h2{color:var(--orange)}
+.tl-item.p3 .tl-card h2{color:var(--lime-dark)}
+.tl-item.p4 .tl-card h2{color:var(--green)}
+
+.tl-card p{
+  font-size:.83rem;color:var(--muted);
+  line-height:1.7;margin-bottom:16px;
+}
+.card-months{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.cmonth{
+  padding:3px 11px;border-radius:50px;
+  font-size:.67rem;font-weight:800;
+}
+.tl-item.p1 .cmonth{background:var(--purple-light);color:var(--purple)}
+.tl-item.p2 .cmonth{background:var(--orange-light);color:var(--orange)}
+.tl-item.p3 .cmonth{background:#F5FFD0;color:var(--lime-dark)}
+.tl-item.p4 .cmonth{background:var(--green-light);color:#00915A}
+
+.card-cta{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 20px;border-radius:50px;
+  font-size:.78rem;font-weight:800;
+  color:#fff;transition:transform .2s,box-shadow .2s;
+}
+.tl-item.p1 .card-cta{background:var(--purple);box-shadow:0 4px 16px rgba(107,92,231,.3)}
+.tl-item.p2 .card-cta{background:var(--orange);box-shadow:0 4px 16px rgba(255,107,53,.3)}
+.tl-item.p3 .card-cta{background:var(--lime-dark);box-shadow:0 4px 16px rgba(155,196,0,.3)}
+.tl-item.p4 .card-cta{background:var(--green);box-shadow:0 4px 16px rgba(0,201,122,.3)}
+.card-cta:hover{transform:scale(1.05)}
+
+/* Node center */
+.tl-node-col{display:flex;justify-content:center;align-items:center;position:relative;z-index:2}
+.tl-node{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;border:4px solid var(--white);
+  box-shadow:var(--card-shadow);
+  position:relative;transition:transform .2s;
+  flex-shrink:0;
+}
+.tl-item.p1 .tl-node{background:var(--purple)}
+.tl-item.p2 .tl-node{background:var(--orange)}
+.tl-item.p3 .tl-node{background:var(--lime);border-color:var(--white)}
+.tl-item.p4 .tl-node{background:var(--green)}
+.tl-node::after{
+  content:'';position:absolute;inset:-8px;border-radius:50%;
+  border:2.5px solid currentColor;opacity:.2;
+  animation:ring 2.2s ease-in-out infinite;
+}
+.tl-item.p1 .tl-node::after{color:var(--purple)}
+.tl-item.p2 .tl-node::after{color:var(--orange);animation-delay:.25s}
+.tl-item.p3 .tl-node::after{color:var(--lime-dark);animation-delay:.5s}
+.tl-item.p4 .tl-node::after{color:var(--green);animation-delay:.75s}
+@keyframes ring{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.2);opacity:.05}}
+
+/* Arrow connector to node */
+.tl-item.left .tl-card::after{
+  content:'';position:absolute;right:-14px;top:50%;
+  transform:translateY(-50%);
+  border:7px solid transparent;border-left-color:var(--white);
+}
+.tl-item.right .tl-card::after{
+  content:'';position:absolute;left:-14px;top:50%;
+  transform:translateY(-50%);
+  border:7px solid transparent;border-right-color:var(--white);
+}
+.tl-empty{display:flex}
+
+/* Layout sides */
+.tl-item.left .tl-card{order:1}
+.tl-item.left .tl-node-col{order:2}
+.tl-item.left .tl-empty{order:3}
+.tl-item.right .tl-empty{order:1}
+.tl-item.right .tl-node-col{order:2}
+.tl-item.right .tl-card{order:3}
+
+/* ═══ DETAIL VIEW ═══ */
+#view-detail{min-height:100vh;background:var(--bg)}
+
+.topbar{
+  height:62px;display:flex;align-items:center;padding:0 32px;
+  position:sticky;top:0;z-index:100;
+  background:rgba(240,238,255,.9);
+  border-bottom:2px solid rgba(107,92,231,.1);
+  backdrop-filter:blur(16px);
+}
+.back-btn{
+  display:flex;align-items:center;gap:8px;
+  background:var(--purple);color:#fff;
+  border:none;border-radius:50px;padding:8px 18px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;
+  transition:transform .2s,box-shadow .2s;
+  box-shadow:0 4px 16px rgba(107,92,231,.3);
+}
+.back-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(107,92,231,.4)}
+
+.phase-tabs{display:flex;gap:8px;margin-left:auto}
+.phase-tab{
+  width:36px;height:36px;border-radius:12px;
+  border:2px solid rgba(107,92,231,.15);
+  background:var(--white);font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+.phase-tab:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.phase-tab.cur{border-color:var(--purple);background:var(--purple-light)}
+
+/* Hero detail */
+.d-hero{padding:48px 48px 40px;position:relative;overflow:hidden}
+.d-hero-inner{max-width:860px;position:relative;z-index:1}
+.d-sem{
+  display:inline-block;
+  padding:5px 16px;border-radius:50px;
+  font-size:.68rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:16px;color:#fff;
+}
+.d-hero h1{
+  font-family:'Fredoka One',cursive;
+  font-size:3rem;line-height:1.1;margin-bottom:12px;color:var(--dark);
+}
+.d-sub{font-size:.92rem;font-weight:600;max-width:500px;line-height:1.7;color:var(--text)}
+.d-months{display:flex;gap:7px;margin-top:20px;flex-wrap:wrap}
+.d-mchip{
+  padding:5px 15px;border-radius:50px;
+  font-size:.73rem;font-weight:800;background:rgba(255,255,255,.5);
+  border:1.5px solid rgba(255,255,255,.8);
+  backdrop-filter:blur(4px);
+}
+
+.d-body{background:var(--bg);padding:36px 48px 100px}
+.d-body-inner{max-width:860px;margin:0 auto}
+
+/* Step context */
+.step-ctx{
+  display:grid;grid-template-columns:1fr 1fr;
+  border-radius:20px;overflow:hidden;
+  box-shadow:var(--card-shadow);margin-bottom:28px;
+}
+.ctx-h{padding:24px 28px;background:var(--white)}
+.ctx-h:first-child{border-right:2px solid var(--bg)}
+.ctx-label{
+  display:flex;align-items:center;gap:7px;
+  font-size:.63rem;font-weight:900;text-transform:uppercase;
+  letter-spacing:1.5px;margin-bottom:10px;color:currentColor;
+}
+.ctx-ico{
+  width:22px;height:22px;border-radius:8px;
+  background:currentColor;display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;
+}
+.ctx-ico span{filter:brightness(10)}
+.ctx-h.p1{color:var(--purple)}.ctx-h.p2{color:var(--orange)}
+.ctx-h.p3{color:var(--lime-dark)}.ctx-h.p4{color:var(--green)}
+.ctx-h h4{font-family:'Fredoka One',cursive;font-size:1.05rem;color:var(--dark);margin-bottom:8px}
+.ctx-h p{font-size:.8rem;color:var(--muted);line-height:1.65}
+.ctx-h ul{padding-left:16px;margin-top:6px}
+.ctx-h li{font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:4px}
+.del-tag{
+  display:inline-flex;align-items:center;
+  padding:5px 14px;border-radius:50px;margin-top:12px;
+  font-size:.69rem;font-weight:800;
+  background:currentColor;
+}
+.del-tag span{color:white;filter:none}
+
+.sec-title{
+  font-family:'Fredoka One',cursive;
+  font-size:.9rem;color:var(--purple);
+  margin:28px 0 14px;
+  display:flex;align-items:center;gap:8px;
+}
+.sec-title::after{content:'';flex:1;height:2px;background:var(--purple-light);border-radius:1px}
+
+/* Flip cards */
+.cg{display:grid;gap:14px}.cols3{grid-template-columns:1fr 1fr 1fr}
+.flip{perspective:1000px;height:176px;cursor:pointer}
+.fi{position:relative;width:100%;height:100%;
+  transition:transform .55s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+.flip.done .fi{transform:rotateY(180deg)}
+.ff,.fb{position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:18px;padding:22px;display:flex;flex-direction:column;justify-content:center}
+.fb{transform:rotateY(180deg)}
+.ff.p1{background:var(--purple);color:#fff}
+.ff.p2{background:var(--orange);color:#fff}
+.fb.p1{background:var(--purple-light);border:2px solid var(--purple-mid)}
+.fb.p2{background:var(--orange-light);border:2px solid rgba(255,107,53,.3)}
+.ff .fic{font-size:2rem;margin-bottom:10px}
+.ff h3{font-family:'Fredoka One',cursive;font-size:1rem;line-height:1.3}
+.ff .fh{font-size:.69rem;opacity:.7;margin-top:6px;font-weight:600}
+.fb h3{font-family:'Fredoka One',cursive;font-size:.95rem;margin-bottom:8px;color:var(--dark)}
+.fb p{font-size:.76rem;line-height:1.55;color:var(--text)}
+.fb .ftag{display:inline-block;background:rgba(107,92,231,.1);border-radius:50px;
+  font-size:.67rem;font-weight:800;padding:3px 10px;margin-top:8px;color:var(--purple)}
+
+/* Roles */
+.roles-c{background:var(--white);border-radius:20px;padding:20px 24px;
+  box-shadow:var(--card-shadow);margin-top:14px}
+.roles-c h3{font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--purple);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.rr{display:flex;align-items:flex-start;gap:12px;padding:10px 0;
+  border-bottom:2px solid var(--bg)}
+.rr:last-child{border-bottom:none;padding-bottom:0}
+.rav{width:36px;height:36px;border-radius:12px;background:var(--purple-light);
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ri strong{font-size:.8rem;font-weight:800;color:var(--dark);display:block}
+.ri span{font-size:.72rem;color:var(--muted);line-height:1.45}
+.r-opt{background:var(--lime);color:var(--lime-dark);font-size:.63rem;font-weight:800;
+  padding:2px 8px;border-radius:50px;margin-left:6px}
+
+/* Comic */
+.comic-c{background:var(--white);border-radius:20px;overflow:hidden;box-shadow:var(--card-shadow)}
+.comic-hdr{padding:16px 22px;display:flex;align-items:center;gap:12px}
+.comic-hdr h3{font-family:'Fredoka One',cursive;font-size:1rem;color:#fff}
+.comic-hdr p{font-size:.71rem;color:rgba(255,255,255,.75);margin-top:2px}
+.cstrip{display:flex;overflow-x:auto;padding:20px;gap:0;scroll-snap-type:x mandatory}
+.cstrip::-webkit-scrollbar{height:4px}
+.cstrip::-webkit-scrollbar-track{background:var(--bg)}
+.cstrip::-webkit-scrollbar-thumb{background:var(--purple-mid);border-radius:2px}
+.panel{flex-shrink:0;width:190px;scroll-snap-align:start}
+.psep{width:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.psep::after{content:'›';font-size:22px;color:var(--purple-mid);font-weight:900}
+.pscene{background:var(--purple-light);border:2px solid var(--purple-mid);
+  border-radius:12px 12px 0 0;height:118px;display:flex;align-items:center;
+  justify-content:center;flex-direction:column;gap:4px;padding:10px;position:relative}
+.pico{font-size:2.4rem}
+.pnum{position:absolute;top:6px;left:8px;background:var(--purple);color:white;
+  width:22px;height:22px;border-radius:50%;font-size:.68rem;font-weight:900;
+  display:flex;align-items:center;justify-content:center}
+.pspeech{position:absolute;top:7px;right:7px;background:var(--white);
+  border:1.5px solid var(--purple-mid);border-radius:10px 10px 10px 0;
+  font-size:.61rem;font-weight:700;padding:4px 7px;color:var(--purple);
+  max-width:88px;line-height:1.3}
+.pcap{background:var(--dark);color:rgba(255,255,255,.88);
+  border-radius:0 0 12px 12px;padding:10px 12px;font-size:.69rem;font-weight:700;line-height:1.4}
+.psub{font-size:.62rem;opacity:.55;margin-top:3px;font-weight:600}
+
+/* Flow */
+.flow-c{background:var(--white);border-radius:20px;box-shadow:var(--card-shadow);overflow:hidden}
+.flow-hdr{padding:16px 22px;display:flex;align-items:center;gap:12px}
+.flow-hdr h3{font-family:'Fredoka One',cursive;font-size:1rem;color:#fff}
+.flow-hdr p{font-size:.71rem;color:rgba(255,255,255,.75);margin-top:2px}
+.flow-row{display:flex;align-items:stretch;padding:20px;gap:0;overflow-x:auto}
+.fstep{flex:1;min-width:140px;padding:14px;border-radius:14px;
+  cursor:pointer;transition:background .2s;border:2px solid transparent}
+.fstep:hover{background:var(--orange-light)}
+.fstep.cur{background:var(--orange-light);border-color:rgba(255,107,53,.3)}
+.fsico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;margin-bottom:8px;background:var(--orange-light)}
+.fstep h4{font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--dark);margin-bottom:3px}
+.fstep p{font-size:.7rem;color:var(--muted);line-height:1.4}
+.fwho{margin-top:7px;font-size:.65rem;font-weight:800;color:var(--orange);
+  background:var(--orange-light);border-radius:50px;padding:2px 10px;display:inline-block}
+.farr{display:flex;align-items:center;padding:0 3px;color:var(--orange);
+  font-size:20px;opacity:.35;font-weight:900;flex-shrink:0}
+.fdet{display:none;padding:0 20px 20px}.fdet.on{display:block}
+.fdbox{background:var(--orange-light);border:2px solid rgba(255,107,53,.25);
+  border-radius:16px;padding:18px 22px}
+.fdbox h4{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--orange);margin-bottom:8px}
+.fdbox ul{padding-left:15px}
+.fdbox li{font-size:.8rem;color:var(--text);line-height:1.6;margin-bottom:4px}
+
+/* Checklist */
+.check-c{background:var(--white);border-radius:20px;box-shadow:var(--card-shadow);overflow:hidden}
+.check-hdr{padding:16px 22px;display:flex;align-items:center;gap:12px}
+.check-hdr h3{font-family:'Fredoka One',cursive;font-size:1rem;color:#fff}
+.check-hdr p{font-size:.71rem;color:rgba(255,255,255,.75);margin-top:2px}
+.scsel{padding:18px 22px 0}
+.scsel p{font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--dark);margin-bottom:12px}
+.scbtns{display:flex;gap:8px;flex-wrap:wrap}
+.scbtn{border:2px solid rgba(0,201,122,.25);border-radius:50px;
+  background:var(--green-light);color:#00915A;
+  font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:800;
+  padding:8px 16px;cursor:pointer;transition:all .2s}
+.scbtn:hover{border-color:var(--green);background:rgba(0,201,122,.15)}
+.scbtn.on{background:var(--green);border-color:var(--green);color:#fff}
+.scres{padding:18px 22px 22px;display:none}.scres.on{display:block}
+.aclist{display:flex;flex-direction:column;gap:8px}
+.acitem{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
+  border-radius:14px;border:2px solid transparent;cursor:pointer;transition:all .2s}
+.acitem:hover{border-color:rgba(0,201,122,.25);background:rgba(0,201,122,.04)}
+.acitem.done{background:var(--green-light);border-color:rgba(0,201,122,.3)}
+.acchk{width:24px;height:24px;border:2.5px solid rgba(0,201,122,.3);border-radius:8px;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:white;background:white;transition:all .2s}
+.acitem.done .acchk{background:var(--green);border-color:var(--green)}
+.acinfo strong{font-size:.8rem;font-weight:800;color:var(--dark);display:block}
+.acinfo span{font-size:.72rem;color:var(--muted);line-height:1.4}
+.acwho{margin-top:4px;font-size:.65rem;font-weight:800;color:#00915A;
+  background:var(--green-light);padding:2px 10px;border-radius:50px;display:inline-block}
+
+/* ═══ GLOSARIO ═══ */
+.gfab{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--purple);color:white;border:none;border-radius:50px;
+  padding:12px 22px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;
+  cursor:pointer;display:flex;align-items:center;gap:8px;
+  box-shadow:0 8px 32px rgba(107,92,231,.4);
+  transition:transform .2s,box-shadow .2s;z-index:900;
+}
+.gfab:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(107,92,231,.5)}
+.gov{position:fixed;inset:0;background:rgba(45,34,96,.4);backdrop-filter:blur(6px);
+  z-index:1000;display:none;align-items:flex-end;justify-content:flex-end;padding:18px}
+.gov.open{display:flex}
+.gpanel{background:var(--white);border-radius:24px;width:460px;max-width:100%;
+  max-height:82vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 80px rgba(45,34,96,.2);overflow:hidden;
+  animation:su .27s cubic-bezier(.4,.2,.2,1)}
+@keyframes su{from{transform:translateY(22px);opacity:0}to{transform:translateY(0);opacity:1}}
+.ghdr{background:linear-gradient(135deg,var(--purple),#9B8FFF);
+  padding:22px 22px 18px;display:flex;justify-content:space-between;
+  align-items:flex-start;flex-shrink:0}
+.ghdr h2{font-family:'Fredoka One',cursive;font-size:1.3rem;color:#fff;margin-bottom:3px}
+.ghdr p{font-size:.72rem;color:rgba(255,255,255,.7);font-weight:600}
+.gtag{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:2px;
+  color:rgba(255,255,255,.55);margin-bottom:5px}
+.gcls{background:rgba(255,255,255,.2);border:none;color:white;font-size:14px;
+  font-weight:800;width:30px;height:30px;border-radius:50%;cursor:pointer;
+  flex-shrink:0;margin-left:10px;transition:background .2s}
+.gcls:hover{background:rgba(255,255,255,.35)}
+.gsrch{padding:12px 16px;border-bottom:2px solid var(--bg);
+  display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ginp{border:none;outline:none;width:100%;font-family:'Nunito',sans-serif;
+  font-size:.85rem;font-weight:700;color:var(--dark);background:transparent}
+.ginp::placeholder{color:var(--muted)}
+.gcats{display:flex;gap:6px;padding:10px 14px;border-bottom:2px solid var(--bg);
+  flex-wrap:wrap;flex-shrink:0}
+.gcat{border:2px solid var(--bg2);border-radius:50px;background:var(--bg);
+  color:var(--muted);font-family:'Nunito',sans-serif;font-size:.69rem;font-weight:800;
+  padding:4px 13px;cursor:pointer;transition:all .18s}
+.gcat:hover{border-color:var(--purple-mid);color:var(--purple)}
+.gcat.on{background:var(--purple);border-color:var(--purple);color:white}
+.glist{overflow-y:auto;flex:1;padding:10px 14px 18px;display:flex;flex-direction:column;gap:8px}
+.glist::-webkit-scrollbar{width:4px}
+.glist::-webkit-scrollbar-thumb{background:var(--purple-mid);border-radius:2px}
+.gterm{border:2px solid var(--bg);border-radius:14px;padding:14px 16px;transition:all .2s}
+.gterm:hover{border-color:var(--purple-mid);background:var(--purple-light)}
+.gthdr{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.gterm h3{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--dark)}
+.gterm p{font-size:.76rem;color:var(--muted);line-height:1.6}
+.gbadge{font-size:.59rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;
+  padding:3px 10px;border-radius:50px;white-space:nowrap;flex-shrink:0}
+.gbadge.proceso{background:var(--purple-light);color:var(--purple)}
+.gbadge.roles{background:var(--orange-light);color:var(--orange)}
+.gbadge.documentos{background:#F5FFD0;color:var(--lime-dark)}
+.gbadge.evaluacion{background:var(--green-light);color:#00915A}
+.gtip{margin-top:7px;background:var(--bg);border-left:3px solid var(--purple-mid);
+  border-radius:0 8px 8px 0;padding:6px 10px;font-size:.71rem;color:var(--muted);
+  font-weight:600;line-height:1.5}
+.gterm.hidden{display:none}
+.gempty{text-align:center;padding:32px;color:var(--muted);font-size:.85rem;font-weight:700}
+
+/* GLOSARIO HERO BTN */
+.glosario-hero-btn{
+  background:var(--white);color:var(--purple);border:2.5px solid var(--purple-mid);
+  border-radius:50px;padding:12px 28px;
+  font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:800;
+  cursor:pointer;display:inline-flex;align-items:center;gap:9px;
+  box-shadow:0 4px 20px rgba(107,92,231,.15);
+  transition:all .25s;margin-bottom:32px;position:relative;z-index:1;
+}
+.glosario-hero-btn:hover{background:var(--purple);color:white;box-shadow:0 8px 28px rgba(107,92,231,.3);transform:translateY(-2px)}
+
+@media(max-width:700px){
+  .tl-item{grid-template-columns:1fr 52px}
+  .tl-item .tl-empty{display:none}
+  .tl-item .tl-card::after{display:none}
+  .tl-item.left .tl-card{order:1}.tl-item.left .tl-node-col{order:2}
+  .tl-item.right .tl-node-col{order:1}.tl-item.right .tl-card{order:2}
+  .d-hero{padding:24px 20px 20px}.d-hero h1{font-size:2.2rem}
+  .d-body{padding:20px 16px 80px}
+  .step-ctx{grid-template-columns:1fr}
+  .ctx-h:first-child{border-right:none;border-bottom:2px solid var(--bg)}
+  .cols3{grid-template-columns:1fr}
+  .gov{padding:0;align-items:flex-end}
+  .gpanel{width:100%;border-radius:24px 24px 0 0;max-height:90vh}
+  .gfab{bottom:14px;right:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- VIEW 1: TIMELINE -->
+<div id="view-timeline" class="view active">
+
+  <section class="hero">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+
+    <div class="hero-logo">
+      <div class="logo-dot"></div>
+      <span>MECA · Mejoramiento Continuo Académico</span>
+    </div>
+
+    <h1>Ciclo de <em>Aseguramiento</em><br>de la Calidad</h1>
+    <p class="hero-sub">Un proceso de 4 fases que garantiza que nuestro programa está formando las competencias que promete. ¡Haz clic en cualquier fase para explorarla!</p>
+
+    <div class="hero-phases">
+      <div class="hpill p1"><span class="hpill-ico">📋</span> Planeación</div>
+      <div class="hpill p2"><span class="hpill-ico">📐</span> Assessment</div>
+      <div class="hpill p3"><span class="hpill-ico">🔍</span> Evaluación</div>
+      <div class="hpill p4"><span class="hpill-ico">🚀</span> Mejora</div>
+    </div>
+
+    <button class="glosario-hero-btn" onclick="openGlosario()">📖 Glosario de términos</button>
+
+    <div class="scroll-hint">
+      <span>Conoce el ciclo</span>
+      <div class="scroll-ball"></div>
+    </div>
+  </section>
+
+  <section class="tl-section">
+    <div class="tl-spine"></div>
+
+    <!-- FASE 1 — LEFT -->
+    <div class="tl-item p1 left from-left">
+      <div class="tl-card" onclick="openDetail('planeacion')">
+        <div class="card-deco"></div>
+        <div class="card-top">
+          <span class="card-badge">Fase 01</span>
+          <span class="card-sem">Semestre 1 · Enero – Febrero</span>
+        </div>
+        <h2>Planeación</h2>
+        <p>El líder revisa la Matriz de Cruce, construye el Plan de Assessment, ajusta la rúbrica y la socializa con los profes de los cursos fuente.</p>
+        <div class="card-months">
+          <span class="cmonth">Enero</span>
+          <span class="cmonth">Febrero</span>
+        </div>
+        <div class="card-cta">Explorar esta fase →</div>
+      </div>
+      <div class="tl-node-col"><div class="tl-node">📋</div></div>
+      <div class="tl-empty"></div>
+    </div>
+
+    <!-- FASE 2 — RIGHT -->
+    <div class="tl-item p2 right from-right">
+      <div class="tl-empty"></div>
+      <div class="tl-node-col"><div class="tl-node">📐</div></div>
+      <div class="tl-card" onclick="openDetail('assessment')">
+        <div class="card-deco"></div>
+        <div class="card-top">
+          <span class="card-badge">Fase 02</span>
+          <span class="card-sem">Semestre 1 · Marzo – Agosto</span>
+        </div>
+        <h2>Assessment</h2>
+        <p>Los profes aplican la rúbrica, recolectan evidencias y las entregan al líder. MECA procesa los datos y genera el Informe de Assessment.</p>
+        <div class="card-months">
+          <span class="cmonth">Mar</span><span class="cmonth">Abr</span>
+          <span class="cmonth">May</span><span class="cmonth">Jun</span>
+          <span class="cmonth">Ago</span>
+        </div>
+        <div class="card-cta">Explorar esta fase →</div>
+      </div>
+    </div>
+
+    <!-- FASE 3 — LEFT -->
+    <div class="tl-item p3 left from-left">
+      <div class="tl-card" onclick="openDetail('evaluacion')">
+        <div class="card-deco"></div>
+        <div class="card-top">
+          <span class="card-badge">Fase 03</span>
+          <span class="card-sem">Semestre 2 · Septiembre – Diciembre</span>
+        </div>
+        <h2>Evaluación</h2>
+        <p>El líder analiza el Draft Report, redacta el Informe Final y lo presenta ante el Comité CAE. Juntos definen las acciones de mejora.</p>
+        <div class="card-months">
+          <span class="cmonth">Sep</span><span class="cmonth">Oct</span>
+          <span class="cmonth">Nov</span><span class="cmonth">Dic</span>
+        </div>
+        <div class="card-cta">Explorar esta fase →</div>
+      </div>
+      <div class="tl-node-col"><div class="tl-node">🔍</div></div>
+      <div class="tl-empty"></div>
+    </div>
+
+    <!-- FASE 4 — RIGHT -->
+    <div class="tl-item p4 right from-right">
+      <div class="tl-empty"></div>
+      <div class="tl-node-col"><div class="tl-node">🚀</div></div>
+      <div class="tl-card" onclick="openDetail('mejora')">
+        <div class="card-deco"></div>
+        <div class="card-top">
+          <span class="card-badge">Fase 04</span>
+          <span class="card-sem">Semestres 3–4 · Enero – Agosto</span>
+        </div>
+        <h2>Mejora Continua</h2>
+        <p>Profes y líderes de bloque implementan las acciones del CAE. El líder hace seguimiento y documenta el impacto para alimentar el siguiente ciclo.</p>
+        <div class="card-months">
+          <span class="cmonth">Ene</span><span class="cmonth">Feb</span>
+          <span class="cmonth">Mar</span><span class="cmonth">Abr</span>
+          <span class="cmonth">May</span><span class="cmonth">Jun</span>
+          <span class="cmonth">Ago</span>
+        </div>
+        <div class="card-cta">Explorar esta fase →</div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- VIEW 2: DETAIL -->
+<div id="view-detail" class="view">
+  <div id="dtopbar" class="topbar">
+    <button class="back-btn" onclick="goBack()">← Volver al timeline</button>
+    <div class="phase-tabs">
+      <div class="phase-tab" onclick="openDetail('planeacion')">📋</div>
+      <div class="phase-tab" onclick="openDetail('assessment')">📐</div>
+      <div class="phase-tab" onclick="openDetail('evaluacion')">🔍</div>
+      <div class="phase-tab" onclick="openDetail('mejora')">🚀</div>
+    </div>
+  </div>
+  <div id="dhero" class="d-hero">
+    <div class="d-hero-inner">
+      <div class="d-sem" id="hSem"></div>
+      <h1 id="hTitle"></h1>
+      <p class="d-sub" id="hSub"></p>
+      <div class="d-months" id="hMonths"></div>
+    </div>
+  </div>
+  <div class="d-body"><div class="d-body-inner" id="dBody"></div></div>
+</div>
+
+<!-- GLOSARIO -->
+<button class="gfab" onclick="toggleG()" id="gFab">📖 Glosario</button>
+<div class="gov" id="gOv" onclick="if(event.target===this)toggleG()">
+  <div class="gpanel">
+    <div class="ghdr">
+      <div><div class="gtag">Vocabulario técnico</div><h2>Glosario del Ciclo</h2><p>Todos los términos que necesitas conocer</p></div>
+      <button class="gcls" onclick="toggleG()">✕</button>
+    </div>
+    <div class="gsrch"><span style="font-size:15px;opacity:.4">🔍</span><input class="ginp" type="text" placeholder="Buscar término..." oninput="fG(this.value)" id="gInp"></div>
+    <div class="gcats">
+      <button class="gcat on" onclick="fCat('all',this)">Todos</button>
+      <button class="gcat" onclick="fCat('proceso',this)">Proceso</button>
+      <button class="gcat" onclick="fCat('roles',this)">Roles</button>
+      <button class="gcat" onclick="fCat('documentos',this)">Documentos</button>
+      <button class="gcat" onclick="fCat('evaluacion',this)">Evaluación</button>
+    </div>
+    <div class="glist" id="gList">
+      <div class="gterm" data-cat="proceso"><div class="gthdr"><span class="gbadge proceso">Proceso</span><h3>Assessment</h3></div><p>Proceso sistemático de recolección y análisis de evidencias del desempeño estudiantil. No es una nota; mide si el programa en conjunto está formando bien al estudiante.</p><div class="gtip">💡 Assessment es del programa, no del estudiante individual.</div></div>
+      <div class="gterm" data-cat="proceso"><div class="gthdr"><span class="gbadge proceso">Proceso</span><h3>Ciclo de Mejoramiento Continuo</h3></div><p>Las cuatro fases: Planeación → Assessment → Evaluación → Mejora. Dura 3–4 semestres y se repite por cada competencia del programa.</p><div class="gtip">💡 Un ciclo completo toma aproximadamente año y medio.</div></div>
+      <div class="gterm" data-cat="proceso"><div class="gthdr"><span class="gbadge proceso">Proceso</span><h3>Curso Fuente de Assessment</h3></div><p>Curso donde se recolecta la evidencia del desempeño. Puede ser <strong>formativo</strong> o <strong>sumativo</strong>. La Matriz de Cruce define cuáles lo son.</p><div class="gtip">💡 Ser curso fuente implica responsabilidad adicional para el profe.</div></div>
+      <div class="gterm" data-cat="proceso"><div class="gthdr"><span class="gbadge proceso">Proceso</span><h3>Ruta de Desarrollo de la Competencia</h3></div><p>Secuencia de cursos donde se introduce, desarrolla y evalúa una competencia. Se extrae de la Matriz de Cruce Curricular.</p></div>
+      <div class="gterm" data-cat="proceso"><div class="gthdr"><span class="gbadge proceso">Proceso</span><h3>Muestra de Evidencias</h3></div><p>Trabajos estudiantiles seleccionados: alto, medio y bajo desempeño según la rúbrica. Típicamente 3–6 trabajos por curso fuente.</p><div class="gtip">💡 Es una selección estratégica, no todos los trabajos del curso.</div></div>
+      <div class="gterm" data-cat="roles"><div class="gthdr"><span class="gbadge roles">Rol</span><h3>Líder de Competencia</h3></div><p>Profesor responsable del ciclo de assessment de una competencia. Elabora el Plan, coordina la recolección y presenta el informe ante el CAE.</p><div class="gtip">💡 Es el "dueño" del proceso para esa competencia.</div></div>
+      <div class="gterm" data-cat="roles"><div class="gthdr"><span class="gbadge roles">Rol</span><h3>Líder de Bloque</h3></div><p>Coordina un grupo de cursos relacionados. En Mejora, implementa acciones que impactan varios cursos de su área.</p></div>
+      <div class="gterm" data-cat="roles"><div class="gthdr"><span class="gbadge roles">Rol</span><h3>Oficina MECA</h3></div><p>Procesa datos del assessment, genera el Draft Report y acompaña a los líderes. Presente en todas las fases del ciclo.</p><div class="gtip">💡 MECA acompaña y facilita, no evalúa a los profes.</div></div>
+      <div class="gterm" data-cat="roles"><div class="gthdr"><span class="gbadge roles">Rol</span><h3>Comité CAE</h3></div><p>Director de Programa, Jefes de Departamento, Líderes de Competencia y Directora MECA. Participación en Planeación: opcional.</p><div class="gtip">💡 El CAE se convoca en momentos clave, no opera de forma permanente.</div></div>
+      <div class="gterm" data-cat="documentos"><div class="gthdr"><span class="gbadge documentos">Documento</span><h3>Plan de Assessment</h3></div><p>Elaborado por el Líder al inicio de cada ciclo. Define competencia, indicador, cursos fuente, rúbrica y calendario.</p></div>
+      <div class="gterm" data-cat="documentos"><div class="gthdr"><span class="gbadge documentos">Documento</span><h3>Matriz de Cruce Curricular</h3></div><p>Tabla que cruza competencias con cursos del plan de estudios. Muestra dónde se introduce (I), desarrolla (D) o evalúa (E) cada competencia.</p></div>
+      <div class="gterm" data-cat="documentos"><div class="gthdr"><span class="gbadge documentos">Documento</span><h3>Draft Report</h3></div><p>Primer informe generado por MECA con estadísticas de desempeño por nivel de rúbrica. Punto de partida para el análisis del Líder.</p><div class="gtip">💡 Draft Report = datos. Final Report = interpretación.</div></div>
+      <div class="gterm" data-cat="documentos"><div class="gthdr"><span class="gbadge documentos">Documento</span><h3>Final Report</h3></div><p>Elaborado por el Líder. Incluye análisis cualitativo, causas de brechas y propuestas de mejora. Se presenta ante el CAE para aprobación.</p></div>
+      <div class="gterm" data-cat="documentos"><div class="gthdr"><span class="gbadge documentos">Documento</span><h3>Memo Reflexivo Docente</h3></div><p>Documento corto que el profe completa al final del semestre sobre cómo se desarrolló la competencia en su curso.</p></div>
+      <div class="gterm" data-cat="evaluacion"><div class="gthdr"><span class="gbadge evaluacion">Evaluación</span><h3>Competencia (Student Outcome)</h3></div><p>Conocimientos, habilidades y actitudes que el estudiante debe tener al graduarse. Son del programa, no de un solo curso.</p></div>
+      <div class="gterm" data-cat="evaluacion"><div class="gthdr"><span class="gbadge evaluacion">Evaluación</span><h3>Indicador de Desempeño (PI)</h3></div><p>Comportamiento observable que evidencia el logro de una competencia. La rúbrica describe cómo se ve ese PI en niveles 1–4.</p><div class="gtip">💡 El PI es lo que el profe realmente mide con la rúbrica.</div></div>
+      <div class="gterm" data-cat="evaluacion"><div class="gthdr"><span class="gbadge evaluacion">Evaluación</span><h3>Rúbrica de Competencia</h3></div><p>Instrumento con niveles de desempeño (1 al 4) para cada indicador. Nivel 1 = básico; nivel 4 = desempeño esperado al egreso.</p></div>
+      <div class="gterm" data-cat="evaluacion"><div class="gthdr"><span class="gbadge evaluacion">Evaluación</span><h3>Niveles de Standing</h3></div><p>Clasificación del programa: <strong>Distinguished, Accomplished, Developing</strong> o <strong>Beginning</strong>.</p></div>
+      <div class="gterm" data-cat="evaluacion"><div class="gthdr"><span class="gbadge evaluacion">Evaluación</span><h3>Acción de Mejora</h3></div><p>Intervención concreta para cerrar una brecha. Opera a nivel <strong>micro</strong> (curso), <strong>meso</strong> (bloque) o <strong>macro</strong> (programa). Requiere responsable y plazo.</p></div>
+    </div>
+    <div class="gempty" id="gEmpty" style="display:none">🔍 No encontré ese término.</div>
+  </div>
+</div>
+
+<script>
+// Scroll animations
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.15});
+document.querySelectorAll('.tl-item').forEach(el=>obs.observe(el));
+
+const heroGrads={
+  planeacion:'linear-gradient(135deg,#EDE9FF 0%,#F5F0FF 60%,#fff 100%)',
+  assessment:'linear-gradient(135deg,#FFE8DF 0%,#FFF3EE 60%,#fff 100%)',
+  evaluacion:'linear-gradient(135deg,#F5FFD0 0%,#FAFFF0 60%,#fff 100%)',
+  mejora:'linear-gradient(135deg,#CFFAEB 0%,#EDFFF7 60%,#fff 100%)'
+};
+const heroColors={planeacion:'var(--purple)',assessment:'var(--orange)',evaluacion:'var(--lime-dark)',mejora:'var(--green)'};
+const semColors={planeacion:'var(--purple)',assessment:'var(--orange)',evaluacion:'var(--lime-dark)',mejora:'var(--green)'};
+
+
+const PH={
+planeacion:{sem:'Semestre 1 · Enero – Febrero',title:'Planeación',
+sub:'Todo empieza acá. Antes de medir, hay que organizarse. Seguí estos 3 pasos y tenés el semestre listo.',
+months:['Enero','Febrero'],html:`
+<style>
+.steps-wrap{display:flex;flex-direction:column;gap:0;margin-bottom:28px}
+.step-item{display:flex;gap:0;position:relative}
+.step-left{display:flex;flex-direction:column;align-items:center;width:64px;flex-shrink:0}
+.step-num{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:1.15rem;color:white;flex-shrink:0;z-index:1;
+  box-shadow:0 4px 14px rgba(107,92,231,.3)}
+.step-connector{width:3px;flex:1;margin:4px 0;border-radius:2px;min-height:24px}
+.step-item:last-child .step-connector{display:none}
+.step-body{background:var(--white);border-radius:18px;padding:22px 24px;flex:1;
+  box-shadow:var(--card-shadow);margin-bottom:16px;position:relative;overflow:hidden}
+.step-body::before{content:'';position:absolute;top:0;left:0;width:5px;height:100%;border-radius:0}
+.step-body.s1::before{background:var(--purple)}.step-body.s2::before{background:var(--orange)}.step-body.s3::before{background:var(--green)}
+.step-tag{display:inline-flex;align-items:center;gap:6px;font-size:.62rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:1.5px;padding:4px 12px;border-radius:50px;margin-bottom:10px}
+.step-body h4{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--dark);margin-bottom:8px}
+.step-body > p{font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:10px}
+.step-body ul{padding-left:18px}
+.step-body li{font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:4px}
+.step-outcome{display:flex;align-items:center;gap:8px;margin-top:12px;
+  background:var(--bg);border-radius:10px;padding:9px 13px;font-size:.75rem;font-weight:800;color:var(--dark)}
+
+/* MATRIX */
+.matrix-wrap{background:var(--white);border-radius:20px;box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:20px}
+.matrix-header{background:linear-gradient(135deg,var(--purple),#9B8FFF);padding:20px 26px 16px;color:white}
+.matrix-header h3{font-family:'Fredoka One',cursive;font-size:1.35rem;margin-bottom:4px}
+.matrix-header p{font-size:.81rem;opacity:.8;font-weight:600}
+.matrix-body{padding:22px 26px}
+.matrix-intro{font-size:.83rem;color:var(--muted);line-height:1.65;margin-bottom:18px;
+  background:var(--purple-light);border-radius:12px;padding:14px 18px;border-left:4px solid var(--purple)}
+.matrix-intro strong{color:var(--purple)}
+.mx-table-wrap{overflow-x:auto;border-radius:14px;border:2px solid var(--bg2)}
+.mx-table{width:100%;border-collapse:collapse;min-width:520px}
+.mx-table th{padding:12px 14px;font-size:.71rem;font-weight:900;text-align:center;border-bottom:2px solid var(--bg2)}
+.mx-table td{padding:13px 14px;font-size:.8rem;border-bottom:1px solid var(--bg);vertical-align:middle}
+.mx-table tr:last-child td{border-bottom:none}
+.mx-th-courses{background:var(--dark);color:white;text-align:left!important;width:200px}
+.mx-th-comp{background:var(--purple);color:white}
+.mx-course-cell{display:flex;align-items:center;gap:10px}
+.mx-course-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.mx-course-name{font-weight:800;color:var(--dark);font-size:.79rem;line-height:1.3}
+.mx-course-sub{font-size:.68rem;color:var(--muted);font-weight:600}
+.mx-cell{text-align:center}
+.mx-badge{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:6px 12px;border-radius:10px;font-weight:900;line-height:1}
+.mx-badge .mx-letter{font-family:'Fredoka One',cursive;font-size:1.4rem}
+.mx-badge .mx-word{font-size:.6rem;font-weight:800;opacity:.8}
+.mx-I .mx-badge{background:#FFF8E0;color:#D4A000}
+.mx-T .mx-badge{background:#E0F2FF;color:#2196C9}
+.mx-A .mx-badge{background:#E8F7F2;color:#00915A}
+.mx-TA .mx-badge{background:linear-gradient(135deg,#E0F2FF,#E8F7F2);color:#00915A;border:2px solid rgba(0,145,90,.2)}
+.mx-empty{color:var(--muted);font-size:1.2rem;opacity:.3}
+.mx-source-row{background:rgba(255,230,200,.15)}
+.mx-source-badge{display:inline-block;background:var(--orange);color:white;font-size:.6rem;font-weight:900;padding:2px 8px;border-radius:50px;margin-left:6px;vertical-align:middle}
+.mx-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.mx-leg-item{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:8px 14px;flex:1;min-width:140px}
+.mx-leg-letter{font-family:'Fredoka One',cursive;font-size:1.2rem;font-weight:900;width:24px;text-align:center}
+.mx-leg-text strong{font-size:.75rem;color:var(--dark);display:block}
+.mx-leg-text span{font-size:.68rem;color:var(--muted)}
+.mx-source-note{display:flex;align-items:center;gap:10px;margin-top:14px;background:var(--orange-light);
+  border-radius:12px;padding:12px 16px;border-left:4px solid var(--orange)}
+.mx-source-note p{font-size:.78rem;color:var(--text);font-weight:700;line-height:1.5}
+.mx-source-note strong{color:var(--orange)}
+
+/* ASSESSMENT PLAN TABLE */
+.ap-wrap{background:var(--white);border-radius:20px;box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:20px}
+.ap-header{padding:20px 26px 16px;color:white}
+.ap-header h3{font-family:'Fredoka One',cursive;font-size:1.35rem;margin-bottom:4px}
+.ap-header p{font-size:.81rem;opacity:.85;font-weight:600}
+.ap-intro{font-size:.83rem;color:var(--muted);line-height:1.65;margin:18px 26px;
+  background:var(--orange-light);border-radius:12px;padding:14px 18px;border-left:4px solid var(--orange)}
+.ap-intro strong{color:var(--orange)}
+.ap-cols{display:flex;overflow-x:auto;gap:0;padding:0 26px 22px}
+.ap-col{flex:1;min-width:120px;display:flex;flex-direction:column;align-items:center;
+  text-align:center;padding:16px 10px;border-right:1px solid var(--bg);position:relative}
+.ap-col:last-child{border-right:none}
+.ap-col-ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:10px;flex-shrink:0}
+.ap-col-num{font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;
+  padding:3px 10px;border-radius:50px;margin-bottom:6px;display:inline-block}
+.ap-col-title{font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--dark);margin-bottom:6px;line-height:1.2}
+.ap-col-desc{font-size:.71rem;color:var(--muted);line-height:1.5}
+.ap-example{background:var(--bg);border-radius:0 0 20px 20px;padding:18px 26px}
+.ap-example-label{font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px}
+.ap-example-row{display:flex;gap:8px;overflow-x:auto}
+.ap-ex-cell{background:var(--white);border-radius:10px;padding:12px 14px;flex:1;min-width:110px;border:2px solid var(--bg2)}
+.ap-ex-cell-label{font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px}
+.ap-ex-cell-val{font-size:.77rem;font-weight:700;color:var(--dark);line-height:1.4}
+.ap-summary{display:flex;align-items:flex-start;gap:10px;margin:16px 26px 0;
+  background:var(--purple-light);border-radius:12px;padding:14px 16px;border-left:4px solid var(--purple)}
+.ap-summary p{font-size:.78rem;color:var(--text);font-weight:700;line-height:1.5}
+.ap-summary strong{color:var(--purple)}
+
+/* RUBRICA TABLE */
+.rb-wrap{background:var(--white);border-radius:20px;box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:20px}
+.rb-header{padding:20px 26px 16px;color:white}
+.rb-header h3{font-family:'Fredoka One',cursive;font-size:1.35rem;margin-bottom:4px}
+.rb-header p{font-size:.81rem;opacity:.85;font-weight:600}
+.rb-top-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px 26px}
+.rb-def-card{background:var(--bg);border-radius:14px;padding:16px 18px}
+.rb-def-card h4{font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--dark);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.rb-def-card p{font-size:.78rem;color:var(--muted);line-height:1.55}
+.rb-levels-row{display:flex;gap:8px;padding:0 26px 18px}
+.rb-level{flex:1;border-radius:12px;padding:12px;text-align:center}
+.rb-level-num{font-family:'Fredoka One',cursive;font-size:1.6rem;line-height:1;margin-bottom:3px}
+.rb-level-name{font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:1px}
+.rb-level-desc{font-size:.68rem;font-weight:600;margin-top:4px;opacity:.8}
+.rb-l4{background:#E8F7F2;color:#00915A}
+.rb-l3{background:#E0F2FF;color:#2196C9}
+.rb-l2{background:#FFF8E0;color:#D4A000}
+.rb-l1{background:#FFE8DF;color:var(--orange)}
+.rb-table-wrap{overflow-x:auto;padding:0 26px 22px}
+.rb-table{width:100%;border-collapse:collapse;border-radius:14px;overflow:hidden;min-width:580px}
+.rb-table th{padding:12px 14px;font-size:.7rem;font-weight:900;text-align:left;border-bottom:2px solid var(--bg)}
+.rb-table td{padding:13px 14px;font-size:.78rem;border-bottom:1px solid var(--bg);vertical-align:top}
+.rb-table tr:last-child td{border-bottom:none}
+.rb-th-pi{background:var(--purple);color:white;width:180px}
+.rb-th-crit{background:var(--dark);color:white;width:120px}
+.rb-th-l4{background:#E8F7F2;color:#00915A}
+.rb-th-l3{background:#E0F2FF;color:#2196C9}
+.rb-th-l2{background:#FFF8E0;color:#D4A000}
+.rb-th-l1{background:#FFE8DF;color:var(--orange)}
+.rb-pi-cell strong{font-size:.78rem;font-weight:800;color:var(--purple);display:block;margin-bottom:3px}
+.rb-pi-cell span{font-size:.71rem;color:var(--muted);line-height:1.4}
+.rb-crit-cell{text-align:center}
+.rb-crit-ico{font-size:22px;display:block;margin-bottom:4px}
+.rb-crit-label{font-size:.68rem;font-weight:700;color:var(--dark)}
+.rb-how{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 26px 22px}
+.rb-how-left{background:var(--bg);border-radius:14px;padding:16px 18px}
+.rb-how-left h4{font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--dark);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.rb-how-left p{font-size:.78rem;color:var(--muted);line-height:1.55}
+.rb-how-steps{display:flex;flex-direction:column;gap:8px}
+.rb-how-step{display:flex;align-items:flex-start;gap:10px;background:var(--bg);border-radius:10px;padding:10px 13px}
+.rb-how-step-num{width:24px;height:24px;border-radius:50%;background:var(--purple);color:white;
+  font-size:.72rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rb-how-step p{font-size:.77rem;color:var(--text);line-height:1.45;margin:0}
+.rb-footer-note{margin:0 26px 22px;background:var(--purple-light);border-radius:12px;padding:14px 18px;
+  display:flex;align-items:center;gap:10px;border-left:4px solid var(--purple)}
+.rb-footer-note p{font-size:.78rem;color:var(--text);font-weight:700;line-height:1.5}
+.rb-footer-note strong{color:var(--purple)}
+
+/* DOC LINKS */
+.docs-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.doc-card{background:var(--white);border:2px solid var(--bg2);border-radius:16px;
+  padding:18px 16px;text-decoration:none;color:var(--text);transition:all .2s;
+  display:flex;flex-direction:column;gap:8px}
+.doc-card:hover{border-color:var(--purple);box-shadow:var(--card-shadow);transform:translateY(-3px)}
+.doc-ico-wrap{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.doc-card h4{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--dark)}
+.doc-card p{font-size:.73rem;color:var(--muted);line-height:1.4}
+.doc-cta{font-size:.7rem;font-weight:900;display:flex;align-items:center;gap:5px;margin-top:2px}
+@media(max-width:620px){.docs-grid{grid-template-columns:1fr}.rb-top-row,.rb-how{grid-template-columns:1fr}.rb-levels-row{flex-wrap:wrap}}
+</style>
+
+<!-- VIDEO INTRODUCTORIO -->
+<div style="margin-bottom:28px">
+  <div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin:0 0 14px">
+    🎬 Video introductorio — ¿Qué es la Planeación?
+    <span style="flex:1;height:2px;background:var(--purple-light);border-radius:1px;display:block"></span>
+  </div>
+  <div style="background:var(--white);border-radius:20px;overflow:hidden;box-shadow:var(--card-shadow)">
+    <video
+      controls
+      playsinline
+      style="width:100%;display:block;max-height:480px;background:#000;border-radius:20px"
+      preload="metadata"
+    >
+      <source src="https://mzfiuuohoeoqpsrqmcju.supabase.co/storage/v1/object/sign/imagenes%20timeline%20assesment/IMG_6180.MOV?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZjJmNzAwMC04YTA2LTQ5NzYtYjJmNS05ZDljNWZhNDdmYTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZW5lcyB0aW1lbGluZSBhc3Nlc21lbnQvSU1HXzYxODAuTU9WIiwiaWF0IjoxNzc4ODEwOTE5LCJleHAiOjE4MTAzNDY5MTl9.pVmq8YdbeBXaNOYAVogNstTaR2ftNTtH7ubwTBVCVrs" type="video/mp4">
+      Tu navegador no soporta la reproducción de video.
+    </video>
+    <div style="padding:14px 20px 16px;display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:10px;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">📽️</div>
+      <div>
+        <div style="font-family:'Fredoka One',cursive;font-size:.92rem;color:var(--dark)">Introducción a la Planeación</div>
+        <div style="font-size:.73rem;color:var(--muted);font-weight:600">Mirá el video antes de revisar los pasos — te ayuda a entender el contexto general</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASOS NUMERADOS -->
+<div class="steps-wrap">
+
+  <!-- ══ PASO 1: MATRIZ ══ -->
+  <div class="step-item">
+    <div class="step-left">
+      <div class="step-num" style="background:var(--purple)">1</div>
+      <div class="step-connector" style="background:linear-gradient(var(--purple),var(--orange))"></div>
+    </div>
+    <div class="step-body s1">
+      <div class="step-tag" style="background:var(--purple-light);color:var(--purple)">📅 Enero · Primer mes</div>
+      <h4>Revisá la Matriz de Cruce de tu competencia</h4>
+      <p>La Matriz de Cruce te muestra cuáles cursos del programa introducen, desarrollan o evalúan tu competencia. Acá vas a identificar cuáles son tus <strong>cursos fuente de assessment</strong> — los que tienen que recolectar evidencias este ciclo.</p>
+      <ul>
+        <li>Abrí la Matriz de Cruce de tu programa.</li>
+        <li>Buscá los cursos marcados con <strong>T</strong> (assessment formativo) o <strong>A</strong> (assessment sumativo) — esos son tus fuentes.</li>
+        <li>Confirmá que los cursos siguen activos en el plan de estudios.</li>
+      </ul>
+      <div class="step-outcome">✅ Resultado: sabés exactamente de qué cursos vas a recolectar evidencias este semestre.</div>
+
+      <!-- MATRIZ DETAIL inside step 1 -->
+      <div style="margin-top:22px">
+      <div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin:0 0 12px">🗺️ ¿Cómo luce la Matriz de Cruce?<span style="flex:1;height:2px;background:var(--purple-light);border-radius:1px;display:block"></span></div>
+      <div class="matrix-wrap">
+        <div class="matrix-header"><h3>Matriz de Cruce — Ejemplo simplificado</h3><p>Muestra en qué cursos se presenta, desarrolla y evalúa cada competencia · Programa QUF · Malla 2017</p></div>
+        <div class="matrix-body">
+          <div class="mx-change-alert">
+            <span class="alert-ico">🎨</span>
+            <p><strong>Los colores importan.</strong> En la matriz real, <strong style="color:#7B2D8B">T en morado</strong> = Assessment formativo y <strong style="color:#4A7C2F">A en verde</strong> = Assessment sumativo. Los cursos con nombre <u>subrayado</u> son PBL. Los que dicen <strong>(iSoft)</strong> o <strong>(I)</strong> son cursos tipo "Curso I".</p>
+          </div>
+          <div class="matrix-intro">Cada programa tiene esta matriz. Los cursos con <strong style="color:#7B2D8B">T</strong> o <strong style="color:#4A7C2F">A</strong> son tus <strong>cursos fuente de assessment</strong> — los que tienen que aplicar la rúbrica y entregarte muestras de trabajo estudiantil.</div>
+          <div class="mx-table-wrap">
+          <table class="mx-table">
+            <thead>
+              <tr>
+                <th class="mx-th-courses" colspan="2">CURSOS</th>
+                <th class="mx-th-comp" colspan="4">OUTCOME 1 — Solución de Problemas<br><span style="font-weight:600;opacity:.75;font-size:.65rem">Performance Indicators</span></th>
+                <th class="mx-th-comp" colspan="3" style="background:#5B4A8A">OUTCOME 2 — Diseño<br><span style="font-weight:600;opacity:.75;font-size:.65rem">Performance Indicators</span></th>
+              </tr>
+              <tr>
+                <th class="mx-th-courses" style="background:#1a1650;font-size:.67rem;color:rgba(255,255,255,.6);font-weight:700;width:44px">Sem.</th>
+                <th class="mx-th-courses" style="background:#1a1650;font-size:.67rem;color:rgba(255,255,255,.6);font-weight:700">Nombre del curso</th>
+                <th style="background:#EDE9FF;color:var(--purple);font-size:.67rem;padding:8px 6px;text-align:center">PI 1.1<br><span style="font-weight:600;opacity:.75">Identificar el problema</span></th>
+                <th style="background:#EDE9FF;color:var(--purple);font-size:.67rem;padding:8px 6px;text-align:center">PI 1.2<br><span style="font-weight:600;opacity:.75">Proponer solución</span></th>
+                <th style="background:#EDE9FF;color:var(--purple);font-size:.67rem;padding:8px 6px;text-align:center">PI 1.3<br><span style="font-weight:600;opacity:.75">Justificar solución</span></th>
+                <th style="background:#EDE9FF;color:var(--purple);font-size:.67rem;padding:8px 6px;text-align:center">PI 1.4<br><span style="font-weight:600;opacity:.75">Plan de mejora</span></th>
+                <th style="background:#E8E2FF;color:#5B4A8A;font-size:.67rem;padding:8px 6px;text-align:center">PI 2.1<br><span style="font-weight:600;opacity:.75">Caracterizar necesidades</span></th>
+                <th style="background:#E8E2FF;color:#5B4A8A;font-size:.67rem;padding:8px 6px;text-align:center">PI 2.2<br><span style="font-weight:600;opacity:.75">Plantear diseño</span></th>
+                <th style="background:#E8E2FF;color:#5B4A8A;font-size:.67rem;padding:8px 6px;text-align:center">PI 2.3<br><span style="font-weight:600;opacity:.75">Evaluar resultados</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align:center;font-weight:900;color:var(--muted);font-size:.75rem;background:#f8f8ff">1</td>
+                <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#FFF8E0">🧬</div><div><div class="mx-course-name">Biología general y lab.</div></div></div></td>
+                <td class="mx-cell mx-I"><div class="mx-badge"><span class="mx-letter">I</span><span class="mx-word">Introduce</span></div></td>
+                <td class="mx-cell mx-I"><div class="mx-badge"><span class="mx-letter">I</span><span class="mx-word">Introduce</span></div></td>
+                <td class="mx-cell mx-I"><div class="mx-badge"><span class="mx-letter">I</span><span class="mx-word">Introduce</span></div></td>
+                <td class="mx-cell mx-I"><div class="mx-badge"><span class="mx-letter">I</span><span class="mx-word">Introduce</span></div></td>
+                <td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td>
+              </tr>
+              <tr class="mx-row-pbl">
+                <td style="text-align:center;font-weight:900;color:var(--muted);font-size:.75rem;background:#f8f8ff">3</td>
+                <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#FFF0FF">🧫</div><div><div class="mx-course-name"><span class="mx-pbl">Bioquímica y laboratorio</span><span class="mx-isoft-badge">Curso I</span></div><div class="mx-course-sub" style="font-size:.63rem;color:#1565C0">PBL · Curso I</div></div></div></td>
+                <td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td>
+                <td class="mx-cell mx-I"><div class="mx-badge"><span class="mx-letter">I</span><span class="mx-word">Introduce</span></div></td>
+                <td class="mx-cell mx-I"><div class="mx-badge"><span class="mx-letter">I</span><span class="mx-word">Introduce</span></div></td>
+                <td class="mx-cell mx-empty">—</td>
+              </tr>
+              <tr class="mx-source-row">
+                <td style="text-align:center;font-weight:900;color:var(--muted);font-size:.75rem;background:#f8f8ff">5</td>
+                <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#F3E8FF">⚗️</div><div><div class="mx-course-name"><span class="mx-source-badge">(iSoft)</span> Análisis instrumental I y lab.<span class="mx-isoft-badge">Curso I</span></div><div class="mx-course-sub" style="font-size:.63rem;color:#7B2D8B">Fuente formativa — T morado</div></div></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-empty">—</td>
+              </tr>
+              <tr class="mx-source-row">
+                <td style="text-align:center;font-weight:900;color:var(--muted);font-size:.75rem;background:#f8f8ff">7</td>
+                <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#EAFFEA">🔭</div><div><div class="mx-course-name"><span class="mx-pbl">Biotecnología y laboratorio</span></div><div class="mx-course-sub" style="font-size:.63rem;color:#4A7C2F">PBL · Fuente sumativa — A verde</div></div></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td>
+              </tr>
+              <tr class="mx-source-row">
+                <td style="text-align:center;font-weight:900;color:var(--muted);font-size:.75rem;background:#f8f8ff">7</td>
+                <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#F0FFF0">🏭</div><div><div class="mx-course-name"><span class="mx-source-badge">(iSoft)</span> Farmacotecnia II y lab.<span class="mx-isoft-badge">Curso I</span></div><div class="mx-course-sub" style="font-size:.63rem;color:#7B2D8B">T (O1) + A (O2) · Fuente mixta</div></div></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Formativo</span></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+              </tr>
+              <tr class="mx-source-row">
+                <td style="text-align:center;font-weight:900;color:var(--muted);font-size:.75rem;background:#f8f8ff">8</td>
+                <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#EAFFEA">📋</div><div><div class="mx-course-name">Proyecto de Grado I</div><div class="mx-course-sub" style="font-size:.63rem;color:#4A7C2F">Fuente sumativa — A verde</div></div></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Sumativo</span></div></td>
+                <td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td><td class="mx-cell mx-empty">—</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          <div style="margin-top:18px">
+            <div style="font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px">Convenciones de la matriz</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+              <div class="mx-conv-row" style="background:var(--bg);border-radius:10px;padding:10px 14px"><div class="mx-conv-swatch" style="background:#7B2D8B">T</div><div><strong>T = Assessment Formativo (parcial)</strong><span>Fondo morado. Recolecta evidencias en etapa intermedia.</span></div></div>
+              <div class="mx-conv-row" style="background:var(--bg);border-radius:10px;padding:10px 14px"><div class="mx-conv-swatch" style="background:#4A7C2F">A</div><div><strong>A = Assessment Sumativo (final)</strong><span>Fondo verde. Recolecta evidencias del logro final.</span></div></div>
+              <div class="mx-conv-row" style="background:var(--bg);border-radius:10px;padding:10px 14px"><div class="mx-conv-swatch" style="background:var(--bg2);color:var(--dark);text-decoration:underline;font-size:.75rem">Cur</div><div><strong>Subrayado = PBL</strong><span>Aprendizaje Basado en Problemas.</span></div></div>
+              <div class="mx-conv-row" style="background:var(--bg);border-radius:10px;padding:10px 14px"><div class="mx-conv-swatch" style="background:#1565C0;font-size:.6rem;border-radius:50px;width:auto;padding:0 8px;height:28px;white-space:nowrap">Curso I</div><div><strong>(iSoft) o (I) = Curso I</strong><span>Curso de integración.</span></div></div>
+            </div>
+          </div>
+          <div class="mx-source-note" style="border-color:#7B2D8B;background:#F8F0FF"><p>⭐ <strong>T morado y A verde son los dos tipos de cursos fuente.</strong> Ambos implican aplicar la rúbrica y entregar muestras. T = seguimiento del proceso, A = evaluación del logro final.</p></div>
+
+          <!-- T vs A EXPLICADO -->
+          <div style="margin-top:16px;background:var(--white);border-radius:16px;padding:20px 22px;border:2px solid var(--bg2)">
+            <div style="font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px">🎯 ¿Qué significa que tu curso sea fuente?</div>
+            <p style="font-size:.81rem;color:var(--muted);line-height:1.65;margin-bottom:14px">Si tu curso aparece en la Matriz con una <strong style="color:#7B2D8B">T</strong> o una <strong style="color:#4A7C2F">A</strong>, sos fuente de assessment: tenés que aplicar la rúbrica y entregar una muestra de trabajos al líder. Pero la letra importa — no son lo mismo:</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div style="background:#F3E8FF;border:2px solid #D4B8FF;border-radius:14px;padding:16px 18px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                  <div style="width:36px;height:36px;background:#7B2D8B;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:1.15rem;color:white;flex-shrink:0">T</div>
+                  <div><div style="font-family:'Fredoka One',cursive;font-size:.88rem;color:#7B2D8B">Assessment Formativo</div><div style="font-size:.65rem;font-weight:800;color:#9B6BBF;text-transform:uppercase;letter-spacing:1px">Durante el proceso</div></div>
+                </div>
+                <p style="font-size:.77rem;color:#5a3a7a;line-height:1.6;margin-bottom:8px">Tu curso hace parte del <strong>recorrido de aprendizaje</strong>. La evidencia sirve para hacer seguimiento mientras los estudiantes desarrollan la competencia. No es la medición definitiva del ciclo.</p>
+                <div style="background:rgba(123,45,139,.1);border-radius:8px;padding:7px 10px;font-size:.71rem;color:#7B2D8B;font-weight:700">📌 QUF: Farmacotecnia II · Farmacia asistencial</div>
+              </div>
+              <div style="background:#EAFFEA;border:2px solid #A8E6A8;border-radius:14px;padding:16px 18px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                  <div style="width:36px;height:36px;background:#4A7C2F;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:1.15rem;color:white;flex-shrink:0">A</div>
+                  <div><div style="font-family:'Fredoka One',cursive;font-size:.88rem;color:#4A7C2F">Assessment Sumativo</div><div style="font-size:.65rem;font-weight:800;color:#5a9a3a;text-transform:uppercase;letter-spacing:1px">Evaluación del logro final</div></div>
+                </div>
+                <p style="font-size:.77rem;color:#2d5a2d;line-height:1.6;margin-bottom:8px">Tu curso es el <strong>punto de llegada</strong>. La evidencia que recolectás es la medición definitiva: muestra si el estudiante alcanzó el nivel esperado al finalizar su recorrido.</p>
+                <div style="background:rgba(74,124,47,.1);border-radius:8px;padding:7px 10px;font-size:.71rem;color:#4A7C2F;font-weight:700">📌 QUF: Farmacia Industrial · Farmacia clínica</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;background:var(--bg);border-radius:10px;padding:10px 13px">
+              <span style="font-size:15px;flex-shrink:0">💡</span>
+              <p style="font-size:.77rem;color:var(--text);font-weight:700;line-height:1.5">En ambos casos hacés lo mismo: aplicar la rúbrica, seleccionar la muestra y entregar los trabajos al líder. La diferencia está en <strong>qué representa esa evidencia</strong>: seguimiento del proceso (T) o medición del logro final (A).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /matriz detail -->
+
+    </div>
+  </div>
+
+  <!-- ══ PASO 2: ASSESSMENT PLAN ══ -->
+  <div class="step-item">
+    <div class="step-left">
+      <div class="step-num" style="background:var(--orange)">2</div>
+      <div class="step-connector" style="background:linear-gradient(var(--orange),var(--green))"></div>
+    </div>
+    <div class="step-body s2">
+      <div class="step-tag" style="background:var(--orange-light);color:var(--orange)">📋 Enero · Mismo mes</div>
+      <h4>Armá el Plan de Assessment</h4>
+      <p>Con la información de la Matriz, completás el Plan de Assessment: define qué indicador vas a medir, en qué cursos, con qué instrumento, cuándo y quién es el responsable de recolectar.</p>
+      <ul>
+        <li>Completá el indicador (PI) que vas a evaluar este ciclo.</li>
+        <li>Registrá los cursos fuente y el tipo de evaluación (formativa o sumativa).</li>
+        <li>Definí fechas de recolección y quién entrega qué.</li>
+      </ul>
+      <div class="step-outcome">✅ Resultado: tenés un plan claro de quién entrega qué y cuándo.</div>
+
+      <!-- AP DETAIL inside step 2 -->
+      <div style="margin-top:22px">
+      <div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--orange);display:flex;align-items:center;gap:8px;margin:0 0 12px">📋 ¿Qué contiene el Assessment Plan?<span style="flex:1;height:2px;background:var(--orange-light);border-radius:1px;display:block"></span></div>
+      <div class="ap-wrap">
+        <div class="ap-header" style="background:linear-gradient(135deg,var(--orange),#FF9F6B)">
+          <h3>Assessment Plan — ¿Qué define exactamente?</h3>
+          <p>Define cómo, cuándo y quién recolecta la evidencia para evaluar cada competencia del programa</p>
+        </div>
+        <div class="ap-intro"><strong>¿Para qué sirve?</strong> Asegura que todos evaluemos lo mismo, de la misma forma y en el momento adecuado del ciclo. Sin plan, cada profe haría algo diferente.</div>
+        <div class="ap-cols">
+          <div class="ap-col"><div class="ap-col-ico" style="background:var(--purple-light)">🎯</div><div class="ap-col-num" style="background:var(--purple-light);color:var(--purple)">Columna 1</div><div class="ap-col-title">Performance Indicator</div><div class="ap-col-desc">El indicador específico de la competencia que vas a evaluar este ciclo</div></div>
+          <div class="ap-col"><div class="ap-col-ico" style="background:#E8F7F2">🗺️</div><div class="ap-col-num" style="background:#E8F7F2;color:#00915A">Columna 2</div><div class="ap-col-title">Curricular Mapping</div><div class="ap-col-desc">Los cursos donde se trabaja la competencia según la Matriz de Cruce</div></div>
+          <div class="ap-col"><div class="ap-col-ico" style="background:var(--orange-light)">📁</div><div class="ap-col-num" style="background:var(--orange-light);color:var(--orange)">Columna 3</div><div class="ap-col-title">Source of Assessment</div><div class="ap-col-desc">La fuente y tipo (T formativo / A sumativo) para recolectar la evidencia</div></div>
+          <div class="ap-col"><div class="ap-col-ico" style="background:#E0F2FF">💻</div><div class="ap-col-num" style="background:#E0F2FF;color:#2196C9">Columna 4</div><div class="ap-col-title">Assessment Method</div><div class="ap-col-desc">El instrumento: proyecto, examen, presentación, etc.</div></div>
+          <div class="ap-col"><div class="ap-col-ico" style="background:#FFF8E0">📅</div><div class="ap-col-num" style="background:#FFF8E0;color:#D4A000">Columnas 5–7</div><div class="ap-col-title">Fechas y Responsable</div><div class="ap-col-desc">Cuándo se recolecta, quién es responsable y cuándo se evalúa</div></div>
+        </div>
+        <div class="ap-example">
+          <div class="ap-example-label">📌 Ejemplo real — Assessment Plan QUF Outcome 1 · Cycle 1</div>
+          <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;min-width:700px;font-size:.75rem">
+            <thead>
+              <tr>
+                <th style="background:var(--purple);color:white;padding:10px 12px;text-align:left;font-size:.68rem;border-radius:8px 0 0 0">Performance Indicator</th>
+                <th style="background:var(--purple);color:white;padding:10px 12px;text-align:left;font-size:.68rem">Source of Assessment</th>
+                <th style="background:var(--purple);color:white;padding:10px 12px;text-align:left;font-size:.68rem">Método</th>
+                <th style="background:var(--purple);color:white;padding:10px 12px;text-align:left;font-size:.68rem">Recolección</th>
+                <th style="background:var(--purple);color:white;padding:10px 12px;text-align:left;font-size:.68rem">Responsable</th>
+                <th style="background:var(--purple);color:white;padding:10px 12px;text-align:left;font-size:.68rem;border-radius:0 8px 0 0">Evaluación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:white">
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top;font-weight:700;color:var(--purple)">1-PI1 · Identificar un problema farmacéutico</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top"><div style="display:inline-block;background:#7B2D8B;color:white;border-radius:6px;padding:2px 8px;font-size:.65rem;font-weight:900;margin-bottom:4px">T Formativo</div><br>Farmacotecnia II y lab.<br><span style="color:var(--muted);font-size:.68rem">Farmacia asistencial y práctica</span><br><br><div style="display:inline-block;background:#4A7C2F;color:white;border-radius:6px;padding:2px 8px;font-size:.65rem;font-weight:900;margin-bottom:4px">A Sumativo</div><br>Farmacia Industrial y Lab.<br><span style="color:var(--muted);font-size:.68rem">Farmacia clínica y práctica</span></td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top">Examen parcial<br><span style="color:var(--muted);font-size:.68rem">Parcial 1</span><br><br>Proyecto diseño y formulación<br><span style="color:var(--muted);font-size:.68rem">Trabajo Final</span></td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top;white-space:nowrap">Cycle 1 · 2025-2</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top;font-size:.71rem">Juan F. Pinillos<br>Esteban González<br><span style="color:var(--muted)">Diana Angulo (T)</span><br>Andrés M. Cogollo<br>Steven David Jiménez</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top;white-space:nowrap">Cycle 1 · 2026-1</td>
+              </tr>
+              <tr style="background:var(--bg)">
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg2);vertical-align:top;font-weight:700;color:var(--purple)">1-PI2 · Proponer estrategias de solución</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg2);vertical-align:top"><div style="display:inline-block;background:#7B2D8B;color:white;border-radius:6px;padding:2px 8px;font-size:.65rem;font-weight:900;margin-bottom:4px">T Formativo</div><br>Farmacotecnia II y lab.<br><span style="color:var(--muted);font-size:.68rem">Farmacia asistencial y práctica</span><br><br><div style="display:inline-block;background:#4A7C2F;color:white;border-radius:6px;padding:2px 8px;font-size:.65rem;font-weight:900;margin-bottom:4px">A Sumativo</div><br>Farmacia Industrial y Lab.<br><span style="color:var(--muted);font-size:.68rem">Farmacia clínica y práctica</span></td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg2);vertical-align:top">Completar actividad de Medición<br><span style="color:var(--muted);font-size:.68rem">Parcial 2</span><br><br>Proyecto diseño y formulación<br><span style="color:var(--muted);font-size:.68rem">Trabajo Final</span></td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg2);vertical-align:top;white-space:nowrap">Cycle 1 · 2025-2</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg2);vertical-align:top;font-size:.71rem">Juan F. Pinillos<br>Esteban González<br><span style="color:var(--muted)">Diana Angulo (T)</span><br>Andrés M. Cogollo<br>Steven David Jiménez</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg2);vertical-align:top;white-space:nowrap">Cycle 1 · 2026-1</td>
+              </tr>
+              <tr style="background:white">
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top;font-weight:700;color:var(--purple)">1-PI3 · Justificar la solución propuesta</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top"><div style="display:inline-block;background:#7B2D8B;color:white;border-radius:6px;padding:2px 8px;font-size:.65rem;font-weight:900;margin-bottom:4px">T Formativo</div><br>Farmacotecnia II y lab.<br><span style="color:var(--muted);font-size:.68rem">Farmacia asistencial y práctica</span><br><br><div style="display:inline-block;background:#4A7C2F;color:white;border-radius:6px;padding:2px 8px;font-size:.65rem;font-weight:900;margin-bottom:4px">A Sumativo</div><br>Farmacia Industrial y Lab.<br><span style="color:var(--muted);font-size:.68rem">Farmacia clínica y práctica</span></td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top">Completar actividad de Medición<br><span style="color:var(--muted);font-size:.68rem">Parcial 2</span><br><br>Proyecto diseño y formulación<br><span style="color:var(--muted);font-size:.68rem">Trabajo Final</span></td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top;white-space:nowrap">Cycle 1 · 2025-2</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top;font-size:.71rem">Juan F. Pinillos<br>Esteban González<br><span style="color:var(--muted)">Diana Angulo (T)</span><br>Andrés M. Cogollo<br>Steven David Jiménez</td>
+                <td style="padding:10px 12px;border-bottom:1px solid var(--bg);vertical-align:top;white-space:nowrap">Cycle 1 · 2026-1</td>
+              </tr>
+              <tr style="background:var(--bg)">
+                <td style="padding:10px 12px;vertical-align:top;font-weight:700;color:var(--purple)">1-PI4 · Plan de seguimiento y mejora</td>
+                <td style="padding:10px 12px;vertical-align:top"><div style="display:inline-block;background:#7B2D8B;color:white;border-radius:6px;padding:2px 8px;font-size:.65rem;font-weight:900;margin-bottom:4px">T Formativo</div><br>Farmacotecnia II y lab.<br><span style="color:var(--muted);font-size:.68rem">Farmacia asistencial y práctica</span><br><br><div style="display:inline-block;background:#4A7C2F;color:white;border-radius:6px;padding:2px 8px;font-size:.65rem;font-weight:900;margin-bottom:4px">A Sumativo</div><br>Farmacia Industrial y Lab.<br><span style="color:var(--muted);font-size:.68rem">Farmacia clínica y práctica · Proyecto de Grado II</span></td>
+                <td style="padding:10px 12px;vertical-align:top">Completar actividad de Medición<br><span style="color:var(--muted);font-size:.68rem">Proyecto ed. sanitaria</span><br><br>Proyecto diseño y formulación<br><span style="color:var(--muted);font-size:.68rem">Trabajo Final</span></td>
+                <td style="padding:10px 12px;vertical-align:top;white-space:nowrap">Cycle 1 · 2025-2</td>
+                <td style="padding:10px 12px;vertical-align:top;font-size:.71rem">Juan F. Pinillos<br>Esteban González<br><span style="color:var(--muted)">Diana Angulo (T)</span><br>Andrés M. Cogollo<br>Steven David Jiménez</td>
+                <td style="padding:10px 12px;vertical-align:top;white-space:nowrap">Cycle 1 · 2026-1</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+        <div class="ap-summary"><p>💡 La Matriz indica <strong>dónde</strong> se desarrolla la competencia → El Plan define <strong>cómo y cuándo</strong> se recolecta la evidencia → El responsable recolecta en la fecha indicada → La evaluación ocurre en el momento del ciclo establecido.</p></div>
+      </div>
+      </div><!-- /ap detail -->
+
+    </div>
+  </div>
+
+  <!-- ══ PASO 3: RÚBRICA ══ -->
+  <div class="step-item">
+    <div class="step-left">
+      <div class="step-num" style="background:var(--green)">3</div>
+      <div class="step-connector"></div>
+    </div>
+    <div class="step-body s3">
+      <div class="step-tag" style="background:var(--green-light);color:#00915A">📏 Febrero · Inicio de clases</div>
+      <h4>Revisá y compartí la Rúbrica con los profes</h4>
+      <p>La rúbrica describe qué se espera del estudiante en cada nivel (1 al 4). Cuando inicien clases, reunite con los profes de los cursos fuente para revisar la rúbrica juntos y asegurarte de que todos entienden cómo aplicarla.</p>
+      <ul>
+        <li>Revisá que la rúbrica esté actualizada y alineada con el PI.</li>
+        <li>Reunite o mandá la rúbrica a los profes de cursos fuente.</li>
+        <li>Respondé dudas: ¿cuántos estudiantes muestran? ¿qué actividad usan?</li>
+      </ul>
+      <div class="step-outcome">✅ Resultado: los profes arrancan el semestre sabiendo exactamente qué hacer y cuándo.</div>
+
+      <!-- RÚBRICA DETAIL inside step 3 -->
+      <div style="margin-top:22px">
+      <div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--green);display:flex;align-items:center;gap:8px;margin:0 0 12px">📏 ¿Cómo es la Rúbrica?<span style="flex:1;height:2px;background:var(--green-light);border-radius:1px;display:block"></span></div>
+      <div class="rb-wrap">
+        <div class="rb-header" style="background:linear-gradient(135deg,#00C97A,#00A862)">
+          <h3>Rúbrica: ¿Cómo se evalúa?</h3>
+          <p>La rúbrica define los criterios y niveles de desempeño para evaluar la evidencia recolectada</p>
+        </div>
+        <div class="rb-top-row">
+          <div class="rb-def-card"><h4>🎯 ¿Qué es?</h4><p>Una guía que describe qué se espera del estudiante en cada nivel de desempeño para cada indicador. Permite evaluar de forma objetiva y consistente.</p></div>
+          <div class="rb-def-card"><h4>💡 ¿Para qué sirve?</h4><p>Para que todos los profes evalúen lo mismo con los mismos criterios. Sin rúbrica, cada uno calificaría diferente. Con rúbrica, la evaluación es justa, clara y comparable entre cursos.</p></div>
+        </div>
+        <div style="padding:0 26px 10px;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)">NIVELES DE DESEMPEÑO</div>
+        <div class="rb-levels-row">
+          <div class="rb-level rb-l4"><div class="rb-level-num">4</div><div class="rb-level-name">Outstanding</div><div class="rb-level-desc">Desempeño sobresaliente</div></div>
+          <div class="rb-level rb-l3"><div class="rb-level-num">3</div><div class="rb-level-name">Proficient</div><div class="rb-level-desc">Desempeño competente</div></div>
+          <div class="rb-level rb-l2"><div class="rb-level-num">2</div><div class="rb-level-name">Developing</div><div class="rb-level-desc">Desempeño en desarrollo</div></div>
+          <div class="rb-level rb-l1"><div class="rb-level-num">1</div><div class="rb-level-name">Beginning</div><div class="rb-level-desc">Desempeño inicial</div></div>
+        </div>
+        <div class="rb-table-wrap">
+        <table class="rb-table">
+          <thead>
+            <tr>
+              <th class="rb-th-pi">PERFORMANCE INDICATOR<br><span style="font-weight:600;opacity:.75;font-size:.65rem">Outcome 1 — Solución de Problemas · QUF</span></th>
+              <th class="rb-th-crit">FACTOR<br><span style="font-weight:600;opacity:.75;font-size:.65rem">(Resultado de aprendizaje)</span></th>
+              <th class="rb-th-l4">NIVEL 4 — Outstanding</th>
+              <th class="rb-th-l3">NIVEL 3 — Proficient</th>
+              <th class="rb-th-l2">NIVEL 2 — Developing</th>
+              <th class="rb-th-l1">NIVEL 1 — Beginning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rb-pi-cell"><strong>1-PI1 · Identificar el problema</strong><span>Identificar un problema basado en análisis de información relevante en un contexto farmacéutico, reconociendo patrones y vacíos en el conocimiento.</span></td>
+              <td class="rb-crit-cell"><div class="rb-crit-ico">🔍</div><div class="rb-crit-label">Capacidad para analizar información, reconocer patrones y vacíos</div></td>
+              <td style="font-size:.73rem;color:#00915A"><strong>Identifica de manera precisa y crítica</strong> la información relevante, reconoce con profundidad patrones y vacíos en el conocimiento del problema farmacéutico.</td>
+              <td style="font-size:.73rem;color:#2196C9"><strong>Identifica con claridad</strong> la información relevante, reconoce patrones y vacíos en el conocimiento del problema farmacéutico.</td>
+              <td style="font-size:.73rem;color:#D4A000"><strong>Identifica parcialmente</strong> la información relevante del problema farmacéutico.</td>
+              <td style="font-size:.73rem;color:var(--orange)"><strong>Identifica de manera superficial</strong> la información relevante del problema farmacéutico.</td>
+            </tr>
+            <tr>
+              <td class="rb-pi-cell"><strong>1-PI2 · Proponer estrategia de solución</strong><span>Proponer estrategias basadas en fundamentos teóricos y científicos sólidos, considerando aplicabilidad y limitaciones en el contexto farmacéutico.</span></td>
+              <td class="rb-crit-cell"><div class="rb-crit-ico">💡</div><div class="rb-crit-label">Habilidad para diseñar estrategias teóricas de solución</div></td>
+              <td style="font-size:.73rem;color:#00915A"><strong>Propone una estrategia sólida e innovadora</strong>, integrando de manera crítica conceptos farmacéuticos avanzados, conocimientos científicos y herramientas analíticas adecuadas.</td>
+              <td style="font-size:.73rem;color:#2196C9"><strong>Propone una estrategia bien estructurada</strong>, basada en conocimientos teóricos, científicos, farmacéuticos y empleando herramientas analíticas.</td>
+              <td style="font-size:.73rem;color:#D4A000"><strong>Propone una estrategia con cierto grado</strong> de fundamentación teórica, científica, farmacéutica y/o herramientas analíticas.</td>
+              <td style="font-size:.73rem;color:var(--orange)"><strong>Propone una estrategia poco clara</strong>, sin fundamentación teórica, científica, farmacéutica y/o herramientas analíticas.</td>
+            </tr>
+            <tr>
+              <td class="rb-pi-cell"><strong>1-PI3 · Justificar la solución</strong><span>Justificar la solución propuesta mediante la aplicación integrada de conocimientos disciplinares y el respaldo con evidencia científica pertinente.</span></td>
+              <td class="rb-crit-cell"><div class="rb-crit-ico">📐</div><div class="rb-crit-label">Capacidad para justificar con evidencia científica pertinente</div></td>
+              <td style="font-size:.73rem;color:#00915A"><strong>Justifica de forma rigurosa, crítica y bien estructurada</strong>, articulando los saberes disciplinares con evidencia científica relevante, actual y bien contextualizada.</td>
+              <td style="font-size:.73rem;color:#2196C9"><strong>Justifica con claridad y solidez</strong>, integrando adecuadamente los conocimientos disciplinares y sustentando con evidencia científica pertinente y actual.</td>
+              <td style="font-size:.73rem;color:#D4A000"><strong>Justifica con cierta coherencia</strong> aplicando conocimientos básicos. Integra parcialmente los saberes y utiliza evidencia científica de forma limitada.</td>
+              <td style="font-size:.73rem;color:var(--orange)"><strong>Justifica de manera superficial o incompleta</strong>, con argumentos poco claros y sin respaldo en evidencia científica.</td>
+            </tr>
+            <tr>
+              <td class="rb-pi-cell"><strong>1-PI4 · Plan de seguimiento y mejora</strong><span>Proponer un plan de seguimiento y mejoramiento continuo que evalúa efectividad, pertinencia y/o factibilidad de la solución, desde una perspectiva crítica y analítica.</span></td>
+              <td class="rb-crit-cell"><div class="rb-crit-ico">🔄</div><div class="rb-crit-label">Capacidad para proponer mejoramiento continuo</div></td>
+              <td style="font-size:.73rem;color:#00915A"><strong>Propone un plan integral y sustentado</strong> en enfoque metodológico sólido, con indicadores precisos, estrategias de retroalimentación y pensamiento crítico, analítico y estratégico.</td>
+              <td style="font-size:.73rem;color:#2196C9"><strong>Propone un plan estructurado y coherente</strong>, con indicadores pertinentes y mecanismos de evaluación, aplicando de manera consistente un razonamiento crítico y analítico.</td>
+              <td style="font-size:.73rem;color:#D4A000"><strong>Propone un plan con algunos elementos básicos</strong> y ciertos indicadores. Presenta debilidades en criterios, responsabilidades o estrategias de medición.</td>
+              <td style="font-size:.73rem;color:var(--orange)"><strong>Propone un plan limitado</strong>, sin sustento metodológico claro. No considera indicadores apropiados. Análisis descriptivo sin pensamiento crítico.</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="rb-how">
+          <div class="rb-how-left"><h4>🤔 ¿Cómo se usa?</h4><p>Se revisa la evidencia del estudiante y se determina en qué nivel cumple cada criterio según lo descrito en la rúbrica.</p></div>
+          <div class="rb-how-steps">
+            <div class="rb-how-step"><div class="rb-how-step-num">1</div><p>Recolectás la evidencia según el Assessment Plan</p></div>
+            <div class="rb-how-step"><div class="rb-how-step-num">2</div><p>Comparás la evidencia con los criterios de la rúbrica</p></div>
+            <div class="rb-how-step"><div class="rb-how-step-num">3</div><p>Determinás el nivel de desempeño (1, 2, 3 o 4)</p></div>
+            <div class="rb-how-step"><div class="rb-how-step-num">4</div><p>La rúbrica asegura evaluaciones claras, consistentes y transparentes</p></div>
+          </div>
+        </div>
+        <div class="rb-footer-note"><p>⭐ La rúbrica convierte los criterios en <strong>niveles de desempeño claros</strong> para evaluar de manera justa y objetiva. ¡Compartila con tus profes antes de que arranquen las clases!</p></div>
+      </div>
+      </div><!-- /rubrica detail -->
+
+    </div>
+  </div>
+
+</div><!-- /steps-wrap -->
+
+<!-- DOCS LINKS -->
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin:14px 0">📂 Documentos de referencia — ejemplos reales<span style="flex:1;height:2px;background:var(--purple-light);border-radius:1px;display:block"></span></div>
+<div class="docs-grid">
+  <a class="doc-card" href="https://icesiedu.sharepoint.com/:x:/r/sites/facultad-ingenieria/gestion-curricular/_layouts/15/Doc.aspx?sourcedoc=%7B5847D0E2-E0FE-4335-B4AD-AE4DCB1495CE%7D&file=Matriz%20SIS-PI%20-Out2.xlsx&action=default&mobileredirect=true" target="_blank">
+    <div class="doc-ico-wrap" style="background:#EDE9FF">🗺️</div>
+    <h4>Matriz de Cruce</h4>
+    <p>Ejemplo real de la Matriz SIS-PI del programa. Mirá cómo están mapeadas las competencias en cada curso.</p>
+    <div class="doc-cta" style="color:var(--purple)">Ver ejemplo real →</div>
+  </a>
+  <a class="doc-card" href="https://icesiedu.sharepoint.com/:w:/r/sites/facultad-ingenieria/gestion-curricular/_layouts/15/Doc.aspx?sourcedoc=%7BC9A6BBE5-8DDD-42B3-946C-0586520A242E%7D&file=SSE-AssessmentPlan_SO2_Cycle%203.0%20%20MMROJAS.docx&action=default&mobileredirect=true" target="_blank">
+    <div class="doc-ico-wrap" style="background:var(--orange-light)">📋</div>
+    <h4>Plan de Assessment</h4>
+    <p>Ejemplo completo de un Plan de Assessment real. Usalo como guía para armar el tuyo.</p>
+    <div class="doc-cta" style="color:var(--orange)">Ver ejemplo real →</div>
+  </a>
+  <a class="doc-card" href="https://icesiedu.sharepoint.com/:x:/r/sites/facultad-ingenieria/gestion-curricular/_layouts/15/Doc.aspx?sourcedoc=%7B71F23B83-D1C9-4BAE-A68A-4ADDDB58C474%7D&file=RubricsSSE-Outcome2-Cycle2.2.xlsx&action=default&mobileredirect=true" target="_blank">
+    <div class="doc-ico-wrap" style="background:var(--green-light)">📏</div>
+    <h4>Rúbrica de Competencia</h4>
+    <p>Ejemplo de una rúbrica real con los niveles 1 al 4 para cada indicador. Revisala con tus profes.</p>
+    <div class="doc-cta" style="color:var(--green)">Ver ejemplo real →</div>
+  </a>
+</div>
+
+<!-- ROLES -->
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin:14px 0">👥 ¿Quién hace qué?<span style="flex:1;height:2px;background:var(--purple-light);border-radius:1px;display:block"></span></div>
+<div class="roles-c" style="margin-top:0">
+<h3 style="display:none"></h3>
+<div class="rr"><div class="rav">🧑‍🏫</div><div class="ri"><strong>Vos — Líder de Competencia</strong><span>Revisás la Matriz, armás el Plan de Assessment y compartís la rúbrica con los profes de los cursos fuente.</span></div></div>
+<div class="rr"><div class="rav">📋</div><div class="ri"><strong>Comité CAE <span class="r-opt">Opcional</span></strong><span>Si se convoca, revisa y aprueba el plan. No siempre ocurre, pero es lo ideal.</span></div></div>
+<div class="rr"><div class="rav">🎓</div><div class="ri"><strong>Director de Programa</strong><span>Asegura que la planeación esté alineada con el perfil de egreso.</span></div></div>
+<div class="rr"><div class="rav">🏢</div><div class="ri"><strong>Oficina MECA</strong><span>Te acompaña y hace seguimiento. Te avisa si falta algo antes de arrancar la recolección.</span></div></div>
+</div>`},
+assessment:{sem:'Semestre 1 · Febrero – Agosto',title:'Assessment',
+sub:'Es el corazón del ciclo. Los profes de los cursos fuente aplican la rúbrica, recolectan evidencias y las entregan al líder. MECA procesa los datos. Acá te explicamos todo lo que necesitás saber.',
+months:['Mar','Abr','May','Jun','Jul','Ago'],html:`
+<style>
+.as-timeline{display:flex;flex-direction:column;gap:0;margin-bottom:24px}
+.as-tl-item{display:flex;gap:0;position:relative}
+.as-tl-left{display:flex;flex-direction:column;align-items:center;width:56px;flex-shrink:0}
+.as-tl-dot{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:white;flex-shrink:0;z-index:1;box-shadow:0 3px 12px rgba(0,0,0,.15)}
+.as-tl-line{width:2px;flex:1;margin:4px 0;border-radius:2px;min-height:16px}
+.as-tl-item:last-child .as-tl-line{display:none}
+.as-tl-body{background:var(--white);border-radius:14px;padding:16px 18px;flex:1;box-shadow:0 2px 12px rgba(107,92,231,.07);margin-bottom:12px;border-left:3px solid var(--purple)}
+.as-tl-body.orange{border-color:var(--orange)}.as-tl-body.green{border-color:var(--green)}
+.as-tl-period{font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px}
+.as-tl-body h4{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--dark);margin-bottom:5px}
+.as-tl-body p{font-size:.79rem;color:var(--muted);line-height:1.6}
+.as-tl-body ul{padding-left:16px;margin-top:5px}
+.as-tl-body li{font-size:.79rem;color:var(--muted);line-height:1.6;margin-bottom:3px}
+.as-tl-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.as-tl-chip{padding:3px 10px;border-radius:50px;font-size:.66rem;font-weight:800;background:var(--purple-light);color:var(--purple)}
+.as-tl-chip.orange{background:var(--orange-light);color:var(--orange)}.as-tl-chip.green{background:var(--green-light);color:#00915A}
+.muestra-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.muestra-card{border-radius:12px;padding:14px 16px;text-align:center}
+.muestra-card h5{font-family:'Fredoka One',cursive;font-size:.88rem;margin-bottom:5px}
+.muestra-card p{font-size:.72rem;line-height:1.5}
+.muestra-card.alto{background:#EAFFEA;border:2px solid #A8E6A8}.muestra-card.alto h5{color:#4A7C2F}
+.muestra-card.medio{background:#FFF8E0;border:2px solid #FFE4A0}.muestra-card.medio h5{color:#D4A000}
+.muestra-card.bajo{background:#FFE8DF;border:2px solid #FFB8A0}.muestra-card.bajo h5{color:var(--orange)}
+.fuente-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.fuente-card{border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px}
+.fuente-card.t-card{background:#F3E8FF;border:2px solid #D4B8FF}.fuente-card.a-card{background:#EAFFEA;border:2px solid #A8E6A8}
+.fuente-badge{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:1rem;color:white;flex-shrink:0}
+.t-card .fuente-badge{background:#7B2D8B}.a-card .fuente-badge{background:#4A7C2F}
+.fuente-card h5{font-size:.78rem;font-weight:800;margin-bottom:2px}
+.t-card h5{color:#7B2D8B}.a-card h5{color:#4A7C2F}
+.fuente-card p{font-size:.71rem;color:var(--muted);line-height:1.4}
+.fuente-card .fuente-pi{font-size:.65rem;font-weight:900;margin-top:4px;opacity:.8}
+.memo-card{background:var(--white);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);border-left:4px solid var(--orange);margin-bottom:22px}
+.memo-card h4{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.memo-preguntas{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.memo-q{display:flex;align-items:flex-start;gap:8px;background:var(--orange-light);border-radius:9px;padding:9px 12px;font-size:.78rem;color:var(--text);font-weight:600}
+.memo-q-ico{font-size:14px;flex-shrink:0;margin-top:1px}
+@media(max-width:640px){.fuente-grid,.muestra-grid{grid-template-columns:1fr}}
+</style>
+
+<!-- RESUMEN -->
+<div class="step-ctx" style="margin-bottom:22px">
+<div class="ctx-h p2"><div class="ctx-label"><div class="ctx-ico"><span>⚙️</span></div>Qué pasa en esta fase</div><h4>Recolectar evidencias del desempeño real</h4><p>Es la fase más larga del ciclo (febrero a agosto). Los profes de los cursos fuente aplican la rúbrica en actividades evaluativas reales, seleccionan una muestra de trabajos estudiantiles y se la entregan al líder. Al final, MECA procesa todo y genera el Draft Report.</p><div class="del-tag"><span>📁 Evidencias calificadas + Draft Report entregado</span></div></div>
+<div class="ctx-h p2"><div class="ctx-label"><div class="ctx-ico"><span>🎯</span></div>Qué tiene que estar listo al terminar</div><h4>Datos listos para analizar</h4><ul><li>Todos los cursos fuente entregaron su muestra de evidencias calificadas con la rúbrica.</li><li>Cada muestra incluye trabajos de alto, medio y bajo desempeño.</li><li>Cada profe completó su Memo Reflexivo al final del semestre.</li><li>MECA tiene todos los datos y entregó el Draft Report al líder.</li></ul></div>
+</div>
+
+<!-- ¿QUÉ NO ES? -->
+<div style="background:var(--white);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);margin-bottom:22px">
+  <div style="font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px">🚫 El Assessment NO es...</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:10px;background:var(--bg)"><span style="font-size:15px;flex-shrink:0;margin-top:1px">❌</span><p style="font-size:.76rem;color:var(--text);line-height:1.5"><strong>No es una nota del estudiante.</strong> El assessment mide el <em>programa</em>, no califica al estudiante individual.</p></div>
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:10px;background:var(--bg)"><span style="font-size:15px;flex-shrink:0;margin-top:1px">❌</span><p style="font-size:.76rem;color:var(--text);line-height:1.5"><strong>No es una auditoría al profe.</strong> MECA no evalúa si el profe enseña bien o mal. Es un proceso colaborativo de mejora.</p></div>
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:10px;background:var(--bg)"><span style="font-size:15px;flex-shrink:0;margin-top:1px">❌</span><p style="font-size:.76rem;color:var(--text);line-height:1.5"><strong>No reemplaza la evaluación del curso.</strong> La rúbrica de assessment es diferente a la nota del parcial, aunque puede usarse en la misma actividad.</p></div>
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:10px;background:var(--bg)"><span style="font-size:15px;flex-shrink:0;margin-top:1px">❌</span><p style="font-size:.76rem;color:var(--text);line-height:1.5"><strong>No hay que evaluar a todos los estudiantes.</strong> Solo se necesita una muestra representativa (alto, medio, bajo).</p></div>
+  </div>
+</div>
+
+<!-- TIMELINE MES A MES -->
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin:0 0 12px">📅 ¿Qué pasa mes a mes?<span style="flex:1;height:2px;background:var(--purple-light);border-radius:1px;display:block"></span></div>
+<div class="as-timeline">
+  <div class="as-tl-item"><div class="as-tl-left"><div class="as-tl-dot" style="background:var(--purple)">📬</div><div class="as-tl-line" style="background:linear-gradient(var(--purple),var(--orange))"></div></div><div class="as-tl-body"><div class="as-tl-period" style="color:var(--purple)">Febrero — Inicio del semestre</div><h4>El líder avisa a los profes fuente</h4><p>El líder contacta a los profes de los cursos fuente (T y A) y les recuerda que tienen que recolectar evidencias. Les comparte la rúbrica y el Plan de Assessment para que sepan qué hacer y cuándo.</p><div class="as-tl-chips"><span class="as-tl-chip">📋 Rúbrica socializada</span><span class="as-tl-chip">📅 Fechas acordadas</span><span class="as-tl-chip">❓ Dudas resueltas</span></div></div></div>
+  <div class="as-tl-item"><div class="as-tl-left"><div class="as-tl-dot" style="background:var(--orange)">✍️</div><div class="as-tl-line" style="background:linear-gradient(var(--orange),var(--green))"></div></div><div class="as-tl-body orange"><div class="as-tl-period" style="color:var(--orange)">Marzo – Junio — Durante el semestre</div><h4>Los profes aplican la rúbrica en sus cursos</h4><p>Cada profe fuente usa una actividad evaluativa donde los estudiantes puedan demostrar la competencia. Aplica la rúbrica para calificar según los niveles 1 al 4. No hay que crear una actividad nueva si ya hay una que sirve.</p><div class="as-tl-chips"><span class="as-tl-chip orange">⚗️ Farmacotecnia II: Examen parcial</span><span class="as-tl-chip orange">💊 Farmacia asistencial: Parciales 1 y 2</span></div></div></div>
+  <div class="as-tl-item"><div class="as-tl-left"><div class="as-tl-dot" style="background:var(--green)">📁</div><div class="as-tl-line" style="background:var(--green)"></div></div><div class="as-tl-body green"><div class="as-tl-period" style="color:#00915A">Junio – Julio — Cierre del semestre</div><h4>Los profes entregan la muestra + Memo Reflexivo</h4><p>El profe selecciona una muestra representativa de trabajos ya calificados (alto, medio, bajo) y los entrega al líder junto con el Memo Reflexivo.</p><div class="as-tl-chips"><span class="as-tl-chip green">📎 Muestra de trabajos calificados</span><span class="as-tl-chip green">🪞 Memo Reflexivo completado</span></div></div></div>
+  <div class="as-tl-item"><div class="as-tl-left"><div class="as-tl-dot" style="background:var(--purple)">📊</div></div><div class="as-tl-body"><div class="as-tl-period" style="color:var(--purple)">Julio – Agosto — Post cierre</div><h4>MECA procesa los datos → Draft Report</h4><p>El líder consolida las evidencias y las entrega a MECA. MECA sistematiza los datos y genera el Draft Report con estadísticas de cuántos estudiantes llegaron a cada nivel de desempeño en cada PI.</p><div class="as-tl-chips"><span class="as-tl-chip">📊 Draft Report generado</span><span class="as-tl-chip">📈 % por nivel de desempeño</span><span class="as-tl-chip">➡️ Listo para Evaluación</span></div></div></div>
+</div>
+
+<!-- CÓMIC -->
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin:0 0 12px">🎭 Cómo funciona en la práctica<span style="flex:1;height:2px;background:var(--purple-light);border-radius:1px;display:block"></span></div>
+<style>
+.comic-new{background:var(--white);border-radius:20px;overflow:hidden;box-shadow:var(--card-shadow);margin-bottom:14px}
+.comic-new-hdr{background:var(--purple);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.comic-new-hdr h3{font-family:'Fredoka One',cursive;font-size:1rem;color:white}
+.comic-new-hdr p{font-size:.71rem;color:rgba(255,255,255,.75);margin-top:2px}
+.comic-grid{display:flex;flex-direction:column;gap:0}
+.comic-row{display:grid;gap:0;border-bottom:2px solid var(--bg)}
+.comic-row:last-child{border-bottom:none}
+.comic-row.row2{grid-template-columns:1fr 1fr}
+.comic-panel-new{display:flex;flex-direction:column;border-right:2px solid var(--bg);position:relative}
+.comic-panel-new:last-child{border-right:none}
+.comic-panel-img-wrap{position:relative;overflow:hidden}
+.comic-panel-img-new{width:100%;height:300px;object-fit:cover;object-position:center top;display:block;background:var(--purple-light)}
+.cpnum{
+  position:absolute;top:10px;left:10px;
+  width:30px;height:30px;background:var(--purple);color:white;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:.95rem;
+  box-shadow:0 2px 10px rgba(107,92,231,.5);z-index:2;
+}
+.comic-cap-new{background:#2D2260;padding:13px 15px 15px;flex:1}
+.comic-cap-new p{font-size:.76rem;font-weight:700;color:white;line-height:1.5;margin-bottom:4px}
+.comic-cap-new span{font-size:.65rem;color:#8F87C0;font-weight:600}
+@media(max-width:600px){
+  .comic-row.row2{grid-template-columns:1fr}
+  .comic-panel-img-new{height:220px}
+}
+</style>
+<div class="comic-new">
+  <div class="comic-new-hdr">
+    <span style="font-size:21px">🎭</span>
+    <div><h3>Andrés (profe) y Ana (líder de competencia)</h3><p>Los 5 momentos del assessment</p></div>
+  </div>
+  <div class="comic-grid">
+
+    <!-- Fila 1: Paneles 1, 2 -->
+    <div class="comic-row row2">
+
+      <div class="comic-panel-new">
+        <div class="comic-panel-img-wrap">
+          <img class="comic-panel-img-new" src="https://mzfiuuohoeoqpsrqmcju.supabase.co/storage/v1/object/sign/imagenes%20timeline%20assesment/comic%20assesment/Panel%201.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZjJmNzAwMC04YTA2LTQ5NzYtYjJmNS05ZDljNWZhNDdmYTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZW5lcyB0aW1lbGluZSBhc3Nlc21lbnQvY29taWMgYXNzZXNtZW50L1BhbmVsIDEucG5nIiwiaWF0IjoxNzc4ODE2Mzc1LCJleHAiOjE4MTAzNTIzNzV9.0Et_JVD0JYn0xFtMiOMBwuD-HDH2p0n08in90EP8b4g" alt="Panel 1">
+          <div class="cpnum">1</div>
+        </div>
+        <div class="comic-cap-new">
+          <p>Ana avisa a Andrés que su curso está mapeado como fuente — formativa o sumativa.</p>
+          <span>Febrero · Socialización</span>
+        </div>
+      </div>
+
+      <div class="comic-panel-new">
+        <div class="comic-panel-img-wrap">
+          <img class="comic-panel-img-new" src="https://mzfiuuohoeoqpsrqmcju.supabase.co/storage/v1/object/sign/imagenes%20timeline%20assesment/comic%20assesment/Panel%202.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZjJmNzAwMC04YTA2LTQ5NzYtYjJmNS05ZDljNWZhNDdmYTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZW5lcyB0aW1lbGluZSBhc3Nlc21lbnQvY29taWMgYXNzZXNtZW50L1BhbmVsIDIucG5nIiwiaWF0IjoxNzc4ODE2Mzg0LCJleHAiOjE4MTAzNTIzODR9.G_64r_H4EVytDvVmxLOM7dBrtyXVxs2NkSBf3P10sqI" alt="Panel 2">
+          <div class="cpnum">2</div>
+        </div>
+        <div class="comic-cap-new">
+          <p>Ana comparte la rúbrica. Andrés revisa los <strong>indicadores (PIs)</strong> de su curso y el nivel esperado.</p>
+          <span>Marzo · Revisión de indicadores</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Fila 2: Paneles 3, 4 -->
+    <div class="comic-row row2">
+
+      <div class="comic-panel-new">
+        <div class="comic-panel-img-wrap">
+          <img class="comic-panel-img-new" src="https://mzfiuuohoeoqpsrqmcju.supabase.co/storage/v1/object/sign/imagenes%20timeline%20assesment/comic%20assesment/Panel%203.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZjJmNzAwMC04YTA2LTQ5NzYtYjJmNS05ZDljNWZhNDdmYTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZW5lcyB0aW1lbGluZSBhc3Nlc21lbnQvY29taWMgYXNzZXNtZW50L1BhbmVsIDMucG5nIiwiaWF0IjoxNzc4ODE2MzkzLCJleHAiOjE4MTAzNTIzOTN9.iN9wLpELMH7k1lZywd3-i4s59tu-Y0RyLjUA6vz-3ts" alt="Panel 3">
+          <div class="cpnum">3</div>
+        </div>
+        <div class="comic-cap-new">
+          <p>Andrés diseña una actividad evaluativa donde los estudiantes demuestran la competencia.</p>
+          <span>Abril–Mayo · En el aula</span>
+        </div>
+      </div>
+
+      <div class="comic-panel-new">
+        <div class="comic-panel-img-wrap">
+          <img class="comic-panel-img-new" src="https://mzfiuuohoeoqpsrqmcju.supabase.co/storage/v1/object/sign/imagenes%20timeline%20assesment/comic%20assesment/Panel%204.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZjJmNzAwMC04YTA2LTQ5NzYtYjJmNS05ZDljNWZhNDdmYTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZW5lcyB0aW1lbGluZSBhc3Nlc21lbnQvY29taWMgYXNzZXNtZW50L1BhbmVsIDQucG5nIiwiaWF0IjoxNzc4ODUwODY3LCJleHAiOjE4MTAzODY4Njd9.tXPiWe_AEaQH90l75QBnehDiQPPKyGPEjkouLf80K6k" alt="Panel 4">
+          <div class="cpnum">4</div>
+        </div>
+        <div class="comic-cap-new">
+          <p>Andrés selecciona la muestra (alto/medio/bajo) y la entrega al líder anonimizada.</p>
+          <span>Junio · Evidencias</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Fila 3: Panel 5 solo, centrado -->
+    <div class="comic-row row2" style="grid-template-columns:1fr 1fr">
+
+      <div class="comic-panel-new">
+        <div class="comic-panel-img-wrap">
+          <img class="comic-panel-img-new" src="https://mzfiuuohoeoqpsrqmcju.supabase.co/storage/v1/object/sign/imagenes%20timeline%20assesment/comic%20assesment/Panel%205.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZjJmNzAwMC04YTA2LTQ5NzYtYjJmNS05ZDljNWZhNDdmYTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZW5lcyB0aW1lbGluZSBhc3Nlc21lbnQvY29taWMgYXNzZXNtZW50L1BhbmVsIDUucG5nIiwiaWF0IjoxNzc4ODE2NDA5LCJleHAiOjE4MTAzNTI0MDl9.wTAGXrHtES2Tvb4Ksjc11o3l621sESxL18K74CMpEOs" alt="Panel 5">
+          <div class="cpnum">5</div>
+        </div>
+        <div class="comic-cap-new">
+          <p>Ana consolida datos con MECA y elabora el informe preliminar de assessment.</p>
+          <span>Julio–Agosto · Draft Report</span>
+        </div>
+      </div>
+
+      <!-- Celda vacía con mensaje final -->
+      <div style="background:#2D2260;display:flex;align-items:center;justify-content:center;padding:32px 24px;text-align:center">
+        <div>
+          <div style="font-size:2.5rem;margin-bottom:12px">📊</div>
+          <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:white;margin-bottom:8px">¡El Draft Report está listo!</p>
+          <p style="font-size:.78rem;color:#8F87C0;line-height:1.6">MECA tiene todos los datos. Ahora empieza la fase de <strong style="color:#C4B8FF">Evaluación</strong>.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+<div class="roles-c" style="margin-top:0;margin-bottom:22px">
+<h3 style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin-bottom:14px">📎 ¿Cómo seleccionar la muestra de evidencias?</h3>
+<p style="font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:14px">Solo necesitás <strong>3 a 6 trabajos</strong> que representen el rango de desempeño del grupo:</p>
+<div class="muestra-grid">
+  <div class="muestra-card alto"><div style="font-size:2rem;margin-bottom:6px">🏆</div><h5>Nivel Alto</h5><p>Un trabajo de un estudiante que llegó al nivel 3 o 4 en la rúbrica.</p></div>
+  <div class="muestra-card medio"><div style="font-size:2rem;margin-bottom:6px">📊</div><h5>Nivel Medio</h5><p>Un trabajo de un estudiante en nivel 2. Muestra el desempeño promedio del grupo.</p></div>
+  <div class="muestra-card bajo"><div style="font-size:2rem;margin-bottom:6px">📉</div><h5>Nivel Bajo</h5><p>Un trabajo de un estudiante en nivel 1. Muestra dónde están las mayores brechas.</p></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;margin-top:14px;background:var(--purple-light);border-radius:10px;padding:12px 14px;border-left:3px solid var(--purple)">
+  <span style="font-size:16px;flex-shrink:0">💡</span>
+  <p style="font-size:.78rem;color:var(--text);font-weight:700;line-height:1.55">Los trabajos deben ser <strong>anónimos</strong> — quitá el nombre del estudiante antes de entregarlos. El assessment mide el programa, no evalúa al estudiante individualmente.</p>
+</div>
+</div>
+
+<div style="background:var(--white);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);margin-bottom:22px">
+<div style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--purple);margin-bottom:14px">🏫 Cursos fuente del Outcome 1 — QUF Cycle 1</div>
+<p style="font-size:.81rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Si sos profe de alguno de estos cursos en el Cycle 1 (2025-2), te corresponde recolectar evidencias.</p>
+<div class="fuente-grid">
+  <div class="fuente-card t-card"><div class="fuente-badge">T</div><div><h5>(iSoft) Farmacotecnia II y laboratorio</h5><p>Assessment formativo. Evaluás PI 1.1, 1.2, 1.3 y 1.4 mediante examen parcial y actividad de medición.</p><div class="fuente-pi" style="color:#7B2D8B">👤 Juan F. Pinillos · Esteban González</div></div></div>
+  <div class="fuente-card t-card"><div class="fuente-badge">T</div><div><h5>Farmacia asistencial y práctica</h5><p>Assessment formativo. Evaluás PI 1.1, 1.2, 1.3 y 1.4 mediante Parcial 1, Parcial 2 y Proyecto de educación sanitaria.</p><div class="fuente-pi" style="color:#7B2D8B">👤 Diana Angulo Nieva</div></div></div>
+  <div class="fuente-card a-card"><div class="fuente-badge">A</div><div><h5>Farmacia Industrial y Laboratorio</h5><p>Assessment sumativo. Evaluás PI 1.1, 1.2, 1.3 y 1.4 mediante Proyecto enfocado al diseño y formulación.</p><div class="fuente-pi" style="color:#4A7C2F">👤 Andrés M. Cogollo · Carolina del Pilar Mora</div></div></div>
+  <div class="fuente-card a-card"><div class="fuente-badge">A</div><div><h5>Farmacia clínica y práctica</h5><p>Assessment sumativo. Evaluás PI 1.1, 1.2, 1.3 y 1.4 mediante Trabajo Final.</p><div class="fuente-pi" style="color:#4A7C2F">👤 Steven David Jiménez</div></div></div>
+</div>
+</div>
+
+<div class="memo-card">
+  <h4>🪞 El Memo Reflexivo — tu voz en el proceso</h4>
+  <p style="font-size:.81rem;color:var(--text);line-height:1.65;margin-bottom:10px">Es un documento corto que completás al final del semestre. Le da contexto al líder para entender qué hay detrás de los números del Draft Report. <strong>Sin memo, los datos no tienen historia.</strong></p>
+  <p style="font-size:.79rem;color:var(--muted);margin-bottom:8px;font-weight:700">Preguntas típicas que responde:</p>
+  <div class="memo-preguntas">
+    <div class="memo-q"><span class="memo-q-ico">❓</span><span>¿Cómo le fue a mis estudiantes con esta competencia? ¿Qué salió bien?</span></div>
+    <div class="memo-q"><span class="memo-q-ico">❓</span><span>¿Qué dificultades tuvieron? ¿Por qué creen que algunos no llegaron al nivel esperado?</span></div>
+    <div class="memo-q"><span class="memo-q-ico">❓</span><span>¿Hubo algún factor externo que afectó el desempeño?</span></div>
+    <div class="memo-q"><span class="memo-q-ico">❓</span><span>¿Qué cambiarías en tu curso para mejorar el desarrollo de esta competencia el próximo ciclo?</span></div>
+  </div>
+</div>
+
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin:0 0 12px">👥 ¿Quién hace qué en Assessment?<span style="flex:1;height:2px;background:var(--purple-light);border-radius:1px;display:block"></span></div>
+<div class="roles-c" style="margin-top:0">
+<h3 style="display:none"></h3>
+<div class="rr"><div class="rav" style="background:#F3E8FF">🧑‍🏫</div><div class="ri"><strong>Profe del curso fuente — tu rol si sos T o A</strong><span>Aplicás la rúbrica en una actividad de tu curso. Seleccionás la muestra anonimizada. Entregás los trabajos al líder. Completás el Memo Reflexivo al cierre del semestre.</span></div></div>
+<div class="rr"><div class="rav" style="background:#F3E8FF">🧑‍🔬</div><div class="ri"><strong>Líder de Competencia</strong><span>Coordina todo el proceso. Avisa a los profes fuente, resuelve dudas sobre la rúbrica, recibe las muestras y las consolida para entregarlas a MECA.</span></div></div>
+<div class="rr"><div class="rav" style="background:#F3E8FF">🏢</div><div class="ri"><strong>Oficina MECA</strong><span>Acompaña al líder durante todo el semestre. Hace seguimiento de que las entregas ocurran a tiempo y genera el Draft Report al final.</span></div></div>
+</div>`},
+evaluacion:{sem:'Semestre 2 · Septiembre – Diciembre',title:'Evaluación',
+sub:'Llegaron los datos. Ahora hay que entenderlos, interpretarlos y tomar decisiones reales. Esta fase convierte números en acciones concretas de mejora.',
+months:['Sep','Oct','Nov','Dic'],html:`
+<style>
+.ev-step{display:flex;gap:0;position:relative;margin-bottom:14px}
+.ev-step-left{display:flex;flex-direction:column;align-items:center;width:56px;flex-shrink:0}
+.ev-dot{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:white;flex-shrink:0;z-index:1;box-shadow:0 3px 14px rgba(0,0,0,.15)}
+.ev-line{width:2px;flex:1;margin:4px 0;min-height:16px;border-radius:2px}
+.ev-step:last-child .ev-line{display:none}
+.ev-body{background:var(--white);border-radius:16px;padding:18px 22px;flex:1;box-shadow:var(--card-shadow);position:relative;overflow:hidden}
+.ev-body::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:0}
+.ev-body.s1::before{background:var(--orange)}.ev-body.s2::before{background:var(--purple)}
+.ev-body.s3::before{background:#E53935}.ev-body.s4::before{background:var(--green)}
+.ev-label{font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px}
+.ev-body h4{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--dark);margin-bottom:7px}
+.ev-body p{font-size:.8rem;color:var(--muted);line-height:1.65}
+.ev-body ul{padding-left:16px;margin-top:6px}
+.ev-body li{font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:4px}
+.ev-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ev-chip{padding:3px 11px;border-radius:50px;font-size:.66rem;font-weight:800}
+.ev-chip.orange{background:var(--orange-light);color:var(--orange)}
+.ev-chip.purple{background:var(--purple-light);color:var(--purple)}
+.ev-chip.red{background:#FFEBEE;color:#E53935}
+.ev-chip.green{background:var(--green-light);color:#00915A}
+.report-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.report-card{border-radius:16px;padding:18px 20px}
+.report-card.draft{background:var(--orange-light);border:2px solid rgba(232,113,42,.3)}
+.report-card.final{background:var(--purple-light);border:2px solid var(--purple-mid)}
+.report-card h4{font-family:'Fredoka One',cursive;font-size:.95rem;margin-bottom:8px}
+.report-card.draft h4{color:var(--orange)}.report-card.final h4{color:var(--purple)}
+.report-card p{font-size:.78rem;line-height:1.6}
+.report-card.draft p{color:#7a3800}.report-card.final p{color:#3d2a7a}
+.report-card ul{padding-left:15px;margin-top:7px}
+.report-card li{font-size:.77rem;line-height:1.6;margin-bottom:3px}
+.report-card.draft li{color:#7a3800}.report-card.final li{color:#3d2a7a}
+.report-tag{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:900;margin-bottom:8px}
+.report-card.draft .report-tag{background:var(--orange);color:white}
+.report-card.final .report-tag{background:var(--purple);color:white}
+.standing-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:22px}
+.standing-card{border-radius:14px;padding:16px 14px;text-align:center}
+.standing-card .st-num{font-family:'Fredoka One',cursive;font-size:2rem;line-height:1;margin-bottom:4px}
+.standing-card .st-name{font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.standing-card .st-desc{font-size:.7rem;line-height:1.5;font-weight:600}
+.st-4{background:#EAFFEA;border:2px solid #A8E6A8}.st-4 .st-num,.st-4 .st-name{color:#4A7C2F}.st-4 .st-desc{color:#2d5a2d}
+.st-3{background:#E0F2FF;border:2px solid #A0D4F0}.st-3 .st-num,.st-3 .st-name{color:#2196C9}.st-3 .st-desc{color:#1565a0}
+.st-2{background:#FFF8E0;border:2px solid #FFE4A0}.st-2 .st-num,.st-2 .st-name{color:#D4A000}.st-2 .st-desc{color:#7a5a00}
+.st-1{background:#FFE8DF;border:2px solid #FFB8A0}.st-1 .st-num,.st-1 .st-name{color:var(--orange)}.st-1 .st-desc{color:#8a3000}
+.cae-card{background:var(--white);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);margin-bottom:22px}
+.cae-card h4{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cae-members{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.cae-member{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:10px}
+.cae-member-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.cae-member strong{font-size:.79rem;font-weight:800;color:var(--dark);display:block}
+.cae-member span{font-size:.71rem;color:var(--muted);line-height:1.4}
+.mejora-level{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.mejora-lcard{border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+.mejora-lcard.micro{background:#EDE9FF;border:2px solid var(--purple-mid)}
+.mejora-lcard.meso{background:var(--orange-light);border:2px solid rgba(232,113,42,.3)}
+.mejora-lcard.macro{background:var(--green-light);border:2px solid rgba(43,174,126,.3)}
+.mejora-badge{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.mejora-lcard.micro .mejora-badge{background:var(--purple)}
+.mejora-lcard.meso .mejora-badge{background:var(--orange)}
+.mejora-lcard.macro .mejora-badge{background:var(--green)}
+.mejora-lcard h5{font-size:.79rem;font-weight:800;margin-bottom:3px}
+.mejora-lcard.micro h5{color:var(--purple)}.mejora-lcard.meso h5{color:var(--orange)}.mejora-lcard.macro h5{color:#00915A}
+.mejora-lcard p{font-size:.73rem;color:var(--muted);line-height:1.5}
+.mejora-lcard .mejora-who{font-size:.65rem;font-weight:900;margin-top:5px;display:inline-block;padding:2px 8px;border-radius:50px}
+.mejora-lcard.micro .mejora-who{background:var(--purple-light);color:var(--purple)}
+.mejora-lcard.meso .mejora-who{background:var(--orange-light);color:var(--orange)}
+.mejora-lcard.macro .mejora-who{background:var(--green-light);color:#00915A}
+@media(max-width:640px){.report-compare{grid-template-columns:1fr}.standing-grid{grid-template-columns:1fr 1fr}}
+</style>
+
+<div class="step-ctx" style="margin-bottom:22px">
+<div class="ctx-h orange"><div class="ctx-label"><div class="ctx-ico"><span>⚙️</span></div>Qué pasa en esta fase</div><h4>Convertir datos en decisiones</h4><p>El líder tiene el Draft Report. Ahora hay que ir más allá de los números: interpretar qué está pasando, cruzar los datos con los memo reflexivos de los profes, redactar el Final Report y presentarlo ante el CAE para decidir qué acciones de mejora se implementan.</p><div class="del-tag"><span>📊 Final Report aprobado + Acciones de mejora definidas</span></div></div>
+<div class="ctx-h orange"><div class="ctx-label"><div class="ctx-ico"><span>🎯</span></div>Qué tiene que estar listo al terminar</div><h4>Decisiones claras basadas en evidencia</h4><ul><li>El Final Report está redactado y aprobado por el CAE.</li><li>Se identificó en qué indicadores hay brecha y por qué.</li><li>El nivel de Standing del programa está determinado.</li><li>Cada acción de mejora tiene responsable, plazo y nivel de impacto.</li><li>Los planes están registrados y listos para la fase de Mejora.</li></ul></div>
+</div>
+
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--orange);display:flex;align-items:center;gap:8px;margin:0 0 12px">📄 Draft Report vs Final Report — ¿cuál es la diferencia?<span style="flex:1;height:2px;background:var(--orange-light);border-radius:1px;display:block"></span></div>
+<div class="report-compare">
+  <div class="report-card draft"><span class="report-tag">📊 MECA lo genera</span><h4>Draft Report</h4><p>Informe preliminar con estadísticas puras: porcentajes de estudiantes en cada nivel de desempeño por indicador y por curso fuente. <strong>No tiene interpretación</strong> — solo muestra los números.</p><ul><li>% de estudiantes en cada nivel por PI</li><li>Comparativo por curso fuente (T y A)</li><li>Tablas y gráficas de distribución</li><li>Datos crudos sin análisis cualitativo</li></ul></div>
+  <div class="report-card final"><span class="report-tag">🧑‍🔬 El Líder lo redacta</span><h4>Final Report</h4><p>Informe de análisis que cruza los números con los memo reflexivos, explica el <strong>por qué</strong> detrás de los datos y propone acciones de mejora concretas. Es el documento que se presenta ante el CAE.</p><ul><li>Análisis cualitativo de los resultados</li><li>Causas identificadas de las brechas</li><li>Contexto pedagógico (memo reflexivos)</li><li>Propuestas de acciones de mejora</li></ul></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;background:var(--orange-light);border-radius:12px;padding:12px 16px;margin-bottom:22px;border-left:4px solid var(--orange)">
+  <span style="font-size:16px;flex-shrink:0">💡</span>
+  <p style="font-size:.8rem;color:var(--text);font-weight:700;line-height:1.55">El Draft Report te dice <strong>qué</strong> pasó. El Final Report explica <strong>por qué</strong> pasó y <strong>qué vamos a hacer</strong> al respecto. Sin el análisis del líder, los datos no tienen valor para mejorar.</p>
+</div>
+
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--orange);display:flex;align-items:center;gap:8px;margin:0 0 12px">🏆 Niveles de Standing — ¿cómo le fue al programa?<span style="flex:1;height:2px;background:var(--orange-light);border-radius:1px;display:block"></span></div>
+<p style="font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:14px">Al analizar los datos se determina en qué nivel de Standing está el programa en esa competencia. Es del programa, no del estudiante.</p>
+<div class="standing-grid">
+  <div class="standing-card st-4"><div class="st-num">4</div><div class="st-name">Distinguished</div><div class="st-desc">La gran mayoría alcanza el nivel esperado. El programa forma muy bien esta competencia.</div></div>
+  <div class="standing-card st-3"><div class="st-num">3</div><div class="st-name">Accomplished</div><div class="st-desc">La mayoría alcanza el nivel esperado. Buen camino, con oportunidades de mejora.</div></div>
+  <div class="standing-card st-2"><div class="st-num">2</div><div class="st-name">Developing</div><div class="st-desc">Una parte importante no llega al nivel esperado. Se necesitan acciones de mejora.</div></div>
+  <div class="standing-card st-1"><div class="st-num">1</div><div class="st-name">Beginning</div><div class="st-desc">La mayoría no alcanza el nivel esperado. Brecha crítica que requiere intervención urgente.</div></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;background:var(--bg);border-radius:12px;padding:12px 16px;margin-bottom:22px;border-left:4px solid var(--muted)">
+  <span style="font-size:16px;flex-shrink:0">💡</span>
+  <p style="font-size:.8rem;color:var(--text);font-weight:700;line-height:1.55">Un nivel 2 no significa que los estudiantes "reprobaron" — significa que el <strong>programa</strong> tiene que mejorar cómo desarrolla esa competencia.</p>
+</div>
+
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--orange);display:flex;align-items:center;gap:8px;margin:0 0 12px">📅 ¿Cómo fluye el proceso paso a paso?<span style="flex:1;height:2px;background:var(--orange-light);border-radius:1px;display:block"></span></div>
+<div class="ev-step">
+  <div class="ev-step-left"><div class="ev-dot" style="background:var(--orange)">📊</div><div class="ev-line" style="background:linear-gradient(var(--orange),var(--purple))"></div></div>
+  <div class="ev-body s1"><div class="ev-label" style="color:var(--orange)">Paso 1 — Agosto/Septiembre</div><h4>Recibís el Draft Report de MECA</h4><p>MECA te entrega el Draft Report con todos los datos procesados: % de estudiantes en cada nivel (1–4) por indicador, comparativo entre cursos fuente T y A, y distribución general de desempeño.</p><div class="ev-chips"><span class="ev-chip orange">📈 % por nivel de desempeño</span><span class="ev-chip orange">📋 Datos por PI y por curso</span></div></div>
+</div>
+<div class="ev-step">
+  <div class="ev-step-left"><div class="ev-dot" style="background:var(--purple)">🧑‍🔬</div><div class="ev-line" style="background:linear-gradient(var(--purple),#E53935)"></div></div>
+  <div class="ev-body s2"><div class="ev-label" style="color:var(--purple)">Paso 2 — Septiembre/Octubre</div><h4>Analizás los datos y redactás el Final Report</h4><p>Cruzás los números con los memo reflexivos para entender el contexto. Las preguntas clave que tenés que responder:</p><ul><li>¿En qué PI hay más brecha? ¿Es un problema de un curso o de todos?</li><li>¿Los profes identificaron causas pedagógicas en sus memos?</li><li>¿Es una tendencia nueva o ya existía en ciclos anteriores?</li><li>¿Qué nivel de Standing tiene el programa en esta competencia?</li></ul><p style="margin-top:8px">Con eso, redactás el <strong>Final Report</strong>: análisis + causas + propuestas de mejora concretas.</p><div class="ev-chips"><span class="ev-chip purple">🧠 Análisis cualitativo</span><span class="ev-chip purple">📝 Final Report redactado</span></div></div>
+</div>
+<div class="ev-step">
+  <div class="ev-step-left"><div class="ev-dot" style="background:#E53935">🏛️</div><div class="ev-line" style="background:linear-gradient(#E53935,var(--green))"></div></div>
+  <div class="ev-body s3"><div class="ev-label" style="color:#E53935">Paso 3 — Octubre/Noviembre</div><h4>Presentás en el Comité CAE</h4><p>Presentás el Final Report ante el CAE. No es una defensa — es una conversación colectiva. El comité revisa, debate causas y valida el análisis.</p><ul><li>Presentás los hallazgos clave (no todos los datos, los más relevantes).</li><li>El CAE hace preguntas y aporta perspectiva desde otros programas.</li><li>Se aprueba el informe o se piden ajustes antes de definir acciones.</li></ul><div class="ev-chips"><span class="ev-chip red">🏛️ CAE valida el análisis</span><span class="ev-chip red">✅ Informe aprobado</span></div></div>
+</div>
+<div class="ev-step">
+  <div class="ev-step-left"><div class="ev-dot" style="background:var(--green)">🎯</div></div>
+  <div class="ev-body s4"><div class="ev-label" style="color:#00915A">Paso 4 — Noviembre/Diciembre</div><h4>El CAE define las acciones de mejora</h4><p>Con el informe aprobado, el CAE decide qué se va a hacer. Cada acción queda asignada con responsable, plazo y nivel de impacto. Estas acciones son la entrada a la fase de Mejora Continua.</p><div class="ev-chips"><span class="ev-chip green">📋 Acciones con responsable</span><span class="ev-chip green">📅 Plazos definidos</span><span class="ev-chip green">➡️ Listo para Mejora</span></div></div>
+</div>
+
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--orange);display:flex;align-items:center;gap:8px;margin:22px 0 12px">🏛️ ¿Quiénes conforman el Comité CAE?<span style="flex:1;height:2px;background:var(--orange-light);border-radius:1px;display:block"></span></div>
+<div class="cae-card">
+  <h4>🏛️ Comité de Assessment y Evaluación (CAE)</h4>
+  <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;line-height:1.6">El CAE no opera permanentemente — se convoca en los momentos clave del ciclo. Su función es garantizar que las decisiones de mejora sean colectivas, informadas y alineadas con el programa.</p>
+  <div class="cae-members">
+    <div class="cae-member"><div class="cae-member-ico" style="background:var(--purple-light)">🎓</div><div><strong>Director de Programa</strong><span>Lidera el comité, coordina la discusión y toma decisiones macro-curriculares.</span></div></div>
+    <div class="cae-member"><div class="cae-member-ico" style="background:var(--orange-light)">🏢</div><div><strong>Jefes de Departamento</strong><span>Aportan perspectiva disciplinar y se comprometen con la implementación en sus áreas.</span></div></div>
+    <div class="cae-member"><div class="cae-member-ico" style="background:var(--purple-light)">🧑‍🔬</div><div><strong>Líderes de Competencia</strong><span>Presentan sus informes y propuestas de mejora. Hay uno por cada competencia del programa.</span></div></div>
+    <div class="cae-member"><div class="cae-member-ico" style="background:var(--green-light)">📊</div><div><strong>Directora MECA</strong><span>Facilita la reunión, aporta datos comparativos entre programas y hace seguimiento a los acuerdos.</span></div></div>
+  </div>
+  <div style="background:var(--purple-light);border-radius:10px;padding:11px 14px;border-left:3px solid var(--purple)"><p style="font-size:.78rem;color:var(--text);font-weight:700;line-height:1.55">💡 El CAE es el espacio donde el programa aprende de sí mismo. No es una reunión de rendición de cuentas — es una conversación estratégica para mejorar.</p></div>
+</div>
+
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--orange);display:flex;align-items:center;gap:8px;margin:0 0 12px">🎯 Tipos de acciones de mejora<span style="flex:1;height:2px;background:var(--orange-light);border-radius:1px;display:block"></span></div>
+<p style="font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:14px">No todas las brechas requieren el mismo tipo de intervención. Las acciones de mejora operan en tres niveles:</p>
+<div class="mejora-level">
+  <div class="mejora-lcard micro"><div class="mejora-badge" style="background:var(--purple)">🔬</div><div><h5>Nivel Micro — en el curso</h5><p>Cambios dentro de un curso específico: ajustar una actividad evaluativa, incorporar una práctica nueva, cambiar el orden de contenidos. Son los más rápidos de implementar.</p><span class="mejora-who">👤 Profe del curso + Líder de Bloque</span></div></div>
+  <div class="mejora-lcard meso"><div class="mejora-badge" style="background:var(--orange)">🧩</div><div><h5>Nivel Meso — en el bloque</h5><p>Cambios que afectan varios cursos: redistribuir cuándo se trabaja la competencia, alinear criterios entre profes, crear jornadas de reflexión conjuntas.</p><span class="mejora-who">👤 Líder de Bloque + Jefe de Departamento</span></div></div>
+  <div class="mejora-lcard macro"><div class="mejora-badge" style="background:var(--green)">🗺️</div><div><h5>Nivel Macro — en el programa</h5><p>Cambios curriculares estructurales: actualizar la Matriz de Cruce, mover cursos en el plan de estudios, revisar el perfil de egreso. Requieren más tiempo y aprobación institucional.</p><span class="mejora-who">👤 Director de Programa + Comité Curricular</span></div></div>
+</div>
+
+<div class="sec-title" style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--purple);display:flex;align-items:center;gap:8px;margin:0 0 12px">👥 ¿Quién hace qué en Evaluación?<span style="flex:1;height:2px;background:var(--purple-light);border-radius:1px;display:block"></span></div>
+<div class="roles-c" style="margin-top:0"><h3 style="display:none"></h3>
+<div class="rr"><div class="rav" style="background:var(--purple-light)">🧑‍🔬</div><div class="ri"><strong>Líder de Competencia — rol principal en esta fase</strong><span>Analizás el Draft Report, cruzás con los memo reflexivos, determinás el Standing, redactás el Final Report y lo presentás ante el CAE. También proponés las acciones de mejora.</span></div></div>
+<div class="rr"><div class="rav" style="background:var(--orange-light)">🏛️</div><div class="ri"><strong>Comité CAE</strong><span>Escucha la presentación, debate las causas, valida el análisis y aprueba el informe. Decide qué acciones de mejora se implementan y asigna responsables.</span></div></div>
+<div class="rr"><div class="rav" style="background:var(--orange-light)">🎓</div><div class="ri"><strong>Director de Programa</strong><span>Lidera el CAE, toma decisiones de nivel macro y conecta los resultados con los procesos de acreditación del programa.</span></div></div>
+<div class="rr"><div class="rav" style="background:var(--green-light)">📊</div><div class="ri"><strong>Oficina MECA</strong><span>Entrega el Draft Report, facilita la reunión del CAE, aporta datos comparativos entre ciclos y hace seguimiento de los acuerdos.</span></div></div>
+</div>`},
+mejora:{sem:'Semestres 3–4 · Enero – Agosto',title:'Mejora Continua',
+sub:'Los profes y líderes de bloque implementan las acciones del CAE. El líder hace seguimiento periódico y documenta el impacto para alimentar el siguiente ciclo.',
+months:['Ene','Feb','Mar','Abr','May','Jun','Ago'],html:`
+<div class="step-ctx">
+<div class="ctx-h p4"><div class="ctx-label"><div class="ctx-ico"><span>⚙️</span></div>Qué se hace en este paso</div><h4>Ejecutar y hacer seguimiento</h4><p>Profes y líderes de bloque implementan las acciones definidas por el CAE: ajustan actividades evaluativas, refuerzan contenidos, hacen jornadas de reflexión. El líder documenta el impacto al cerrar el ciclo.</p><div class="del-tag"><span>🚀 Registro de avance + cierre del ciclo</span></div></div>
+<div class="ctx-h p4"><div class="ctx-label"><div class="ctx-ico"><span>🎯</span></div>Qué se espera al finalizar</div><h4>Evidencia de cambio real</h4><ul><li>Las acciones de mejora se implementaron según el plan.</li><li>Hay registro documentado del avance de cada acción.</li><li>Los profes reportaron resultados en su memo reflexivo.</li><li>El ciclo queda cerrado y el programa está listo para el siguiente.</li></ul></div>
+</div>
+<div class="sec-title">✅ Simulador de Plan de Mejora</div>
+<div class="check-c"><div class="check-hdr" style="background:var(--green)"><span style="font-size:21px">✅</span><div><h3>Simulador de Plan de Mejora</h3><p>Selecciona un problema y ve qué acciones corresponden</p></div></div>
+<div class="scsel"><p>¿Qué problema arrojó el assessment?</p><div class="scbtns">
+<button class="scbtn" onclick="pickSc(0,this)">😟 Estudiantes no alcanzan nivel 3</button>
+<button class="scbtn" onclick="pickSc(1,this)">📋 Rúbrica no alineada</button>
+<button class="scbtn" onclick="pickSc(2,this)">📉 Datos incompletos</button>
+</div></div>
+<div class="scres" id="sr0"><div class="aclist">
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Revisar actividades evaluativas de los cursos fuente</strong><span>Diseñar actividades que exijan evidenciar la competencia en nivel 3 o 4.</span><div class="acwho">👤 Líder de Bloque + Profes</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Capacitación docente en la competencia y su rúbrica</strong><span>Jornada de reflexión donde el líder comparte resultados y discute estrategias.</span><div class="acwho">👤 Líder de Competencia + Jefe de Depto.</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Reforzar el desarrollo en cursos previos</strong><span>Revisar la ruta de desarrollo para asegurar suficiente exposición antes del assessment.</span><div class="acwho">👤 Director + Comité Currículo</div></div></div>
+</div></div>
+<div class="scres" id="sr1"><div class="aclist">
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Taller de revisión de rúbrica con profes fuente</strong><span>Sesión colaborativa para que los descriptores reflejen lo que realmente se puede evidenciar.</span><div class="acwho">👤 Líder de Competencia</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Actualizar Plan de Assessment y Matriz de Cruce</strong><span>Revisar si los cursos fuente son los más adecuados para evidenciar la competencia.</span><div class="acwho">👤 Líder de Competencia + Director</div></div></div>
+</div></div>
+<div class="scres" id="sr2"><div class="aclist">
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Comunicación directa con profes que no entregaron muestras</strong><span>El jefe de departamento garantiza que los planes incluyan actividades de assessment.</span><div class="acwho">👤 Jefe de Departamento</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Reforzar socialización del proceso al inicio del semestre</strong><span>Sesión informativa clara sobre qué entregar, cuándo y en qué formato.</span><div class="acwho">👤 Líder de Competencia</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Calendario visual con fechas clave del ciclo</strong><span>Recordatorio institucional automático para los profes fuente.</span><div class="acwho">👤 Directora MECA + Director</div></div></div>
+</div></div>
+</div>
+<div class="roles-c" style="margin-top:14px"><h3>👥 ¿Quién hace qué en Mejora?</h3>
+<div class="rr"><div class="rav">🧩</div><div class="ri"><strong>Líder de Bloque</strong><span>Coordina mejoras que impactan varios cursos. Lidera jornadas de reflexión docente.</span></div></div>
+<div class="rr"><div class="rav">🧑‍🏫</div><div class="ri"><strong>Profe del curso</strong><span>Implementa las acciones asignadas y reporta resultados via memo reflexivo.</span></div></div>
+<div class="rr"><div class="rav">🎓</div><div class="ri"><strong>Director de Programa</strong><span>Lidera el seguimiento macro y conecta resultados con decisiones de acreditación.</span></div></div>
+</div>`}
+};
+
+let curFlow=null,curSc=null;
+function openDetail(k){
+  const p=PH[k];curFlow=null;curSc=null;
+  document.getElementById('dhero').style.background=heroGrads[k];
+  document.getElementById('hSem').textContent=p.sem;
+  document.getElementById('hSem').style.background=heroColors[k];
+  document.getElementById('hTitle').textContent=p.title;
+  document.getElementById('hTitle').style.color=heroColors[k];
+  document.getElementById('hSub').textContent=p.sub;
+  document.getElementById('hMonths').innerHTML=p.months.map(m=>`<div class="d-mchip">${m}</div>`).join('');
+  document.getElementById('dBody').innerHTML=p.html;
+  const order=['planeacion','assessment','evaluacion','mejora'];
+  document.querySelectorAll('.phase-tab').forEach((t,i)=>t.classList.toggle('cur',order[i]===k));
+  document.getElementById('view-timeline').classList.remove('active');
+  document.getElementById('view-detail').classList.add('active');
+  window.scrollTo(0,0);
+}
+function goBack(){
+  document.getElementById('view-detail').classList.remove('active');
+  document.getElementById('view-timeline').classList.add('active');
+  window.scrollTo(0,0);
+}
+function showFlow(i){
+  const ss=document.querySelectorAll('.fstep'),dd=document.querySelectorAll('.fdet');
+  if(curFlow===i){ss[i]?.classList.remove('cur');dd[i]?.classList.remove('on');curFlow=null;return;}
+  ss.forEach(s=>s.classList.remove('cur'));dd.forEach(d=>d.classList.remove('on'));
+  ss[i]?.classList.add('cur');dd[i]?.classList.add('on');curFlow=i;
+}
+function pickSc(i,btn){
+  const rr=document.querySelectorAll('.scres'),bb=document.querySelectorAll('.scbtn');
+  if(curSc===i){rr[i]?.classList.remove('on');btn.classList.remove('on');curSc=null;return;}
+  rr.forEach(r=>r.classList.remove('on'));bb.forEach(b=>b.classList.remove('on'));
+  rr[i]?.classList.add('on');btn.classList.add('on');curSc=i;
+}
+let gCat='all';
+function toggleG(){
+  const ov=document.getElementById('gOv'),open=ov.classList.contains('open');
+  ov.classList.toggle('open');
+  const fab=document.getElementById('gFab');
+  fab.style.opacity=open?'1':'0';fab.style.pointerEvents=open?'auto':'none';
+  if(!open){document.getElementById('gInp').value='';fG('');gCat='all';
+    document.querySelectorAll('.gcat').forEach((b,i)=>b.classList.toggle('on',i===0));}
+}
+function fG(q){
+  const lq=q.toLowerCase();let v=0;
+  document.querySelectorAll('.gterm').forEach(t=>{
+    const m=(gCat==='all'||t.dataset.cat===gCat)&&(lq===''||t.textContent.toLowerCase().includes(lq));
+    t.classList.toggle('hidden',!m);if(m)v++;
+  });
+  document.getElementById('gEmpty').style.display=v===0?'block':'none';
+}
+function fCat(cat,btn){gCat=cat;document.querySelectorAll('.gcat').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');fG(document.getElementById('gInp')?.value||'');}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('gOv').classList.contains('open'))toggleG();
+});
+</script>
+
+
+<!-- ══════════════════════════
+     VIEW 3: GLOSARIO PAGE
+══════════════════════════ -->
+<div id="view-glosario" class="view">
+<style>
+/* ─── GLOSARIO PAGE ─── */
+.gp-topbar{
+  height:62px;display:flex;align-items:center;padding:0 32px;
+  background:rgba(240,238,255,.92);border-bottom:2px solid rgba(107,92,231,.1);
+  backdrop-filter:blur(16px);position:sticky;top:0;z-index:100;
+}
+.gp-back{
+  display:flex;align-items:center;gap:8px;
+  background:var(--purple);color:#fff;border:none;border-radius:50px;
+  padding:8px 18px;cursor:pointer;font-family:'Nunito',sans-serif;
+  font-size:.82rem;font-weight:800;box-shadow:0 4px 16px rgba(107,92,231,.3);
+  transition:transform .2s,box-shadow .2s;
+}
+.gp-back:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(107,92,231,.4)}
+
+.gp-hero{
+  background:linear-gradient(135deg,var(--purple) 0%,#9B8FFF 60%,#C4B8FF 100%);
+  padding:48px 48px 44px;position:relative;overflow:hidden;
+}
+.gp-hero::after{
+  content:'📖';position:absolute;right:48px;top:50%;transform:translateY(-50%);
+  font-size:7rem;opacity:.12;
+}
+.gp-hero h1{font-family:'Fredoka One',cursive;font-size:2.4rem;color:white;margin-bottom:10px}
+.gp-hero p{color:rgba(255,255,255,.7);font-size:.95rem;font-weight:600;max-width:480px;line-height:1.7}
+
+.gp-search-bar{
+  max-width:1000px;margin:0 auto;
+  padding:28px 24px 0;
+}
+.gp-search-inner{
+  display:flex;align-items:center;gap:12px;
+  background:var(--white);border-radius:50px;
+  padding:12px 20px;box-shadow:var(--card-shadow);
+  border:2px solid var(--bg2);
+}
+.gp-search-inner input{
+  border:none;outline:none;flex:1;
+  font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:600;
+  color:var(--dark);background:transparent;
+}
+.gp-search-inner input::placeholder{color:var(--muted)}
+.gp-search-icon{font-size:20px;opacity:.45;flex-shrink:0}
+
+.gp-cats{
+  max-width:1000px;margin:0 auto;
+  padding:16px 24px;
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.gp-cat{
+  border:2px solid var(--bg2);border-radius:50px;
+  background:var(--white);color:var(--muted);
+  font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;
+  padding:6px 16px;cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;gap:6px;
+}
+.gp-cat:hover{border-color:var(--purple-mid);color:var(--purple)}
+.gp-cat.on{background:var(--purple);border-color:var(--purple);color:white}
+.gp-cat-count{
+  background:rgba(255,255,255,.3);border-radius:50px;
+  padding:1px 7px;font-size:.65rem;font-weight:900;
+}
+.gp-cat:not(.on) .gp-cat-count{background:var(--bg2);color:var(--muted)}
+
+.gp-body{
+  max-width:1000px;margin:0 auto;
+  padding:8px 24px 80px;
+}
+.gp-section{margin-bottom:36px}
+.gp-section-title{
+  font-family:'Fredoka One',cursive;font-size:1rem;color:var(--dark);
+  margin-bottom:14px;display:flex;align-items:center;gap:10px;
+  padding-bottom:10px;border-bottom:2px solid var(--bg2);
+}
+.gp-section-ico{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.gp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Term card */
+.gp-term{
+  background:var(--white);border-radius:18px;padding:20px 22px;
+  box-shadow:var(--card-shadow);border:2px solid transparent;
+  transition:all .22s;cursor:default;
+}
+.gp-term:hover{border-color:var(--purple-mid);transform:translateY(-2px);box-shadow:var(--card-shadow-hover)}
+.gp-term.hidden{display:none}
+.gp-term-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.gp-term-ico{width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.gp-term-head h3{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--dark);margin-bottom:3px}
+.gp-badge{font-size:.6rem;font-weight:900;text-transform:uppercase;
+  letter-spacing:1px;padding:2px 9px;border-radius:50px}
+.gp-badge.proceso{background:var(--purple-light);color:var(--purple)}
+.gp-badge.roles{background:var(--orange-light);color:var(--orange)}
+.gp-badge.documentos{background:#F5FFD0;color:var(--lime-dark)}
+.gp-badge.evaluacion{background:var(--green-light);color:#00915A}
+.gp-term-def{font-size:.81rem;color:var(--muted);line-height:1.65;margin-bottom:10px}
+.gp-tip{
+  background:var(--bg);border-radius:10px;padding:9px 13px;
+  font-size:.75rem;font-weight:700;color:var(--text);
+  border-left:3px solid var(--purple-mid);line-height:1.5;
+}
+.gp-tip.orange{border-color:var(--orange)}
+.gp-tip.green{border-color:var(--green)}
+.gp-tip.lime{border-color:var(--lime-dark)}
+.gp-analogy{
+  display:flex;align-items:flex-start;gap:8px;
+  background:var(--purple-light);border-radius:10px;padding:9px 13px;
+  font-size:.76rem;color:var(--text);line-height:1.5;margin-top:8px;
+}
+.gp-analogy-ico{font-size:14px;flex-shrink:0;margin-top:1px}
+.gp-analogy strong{color:var(--purple)}
+
+.gp-empty{text-align:center;padding:60px 24px;color:var(--muted);font-size:.9rem;font-weight:700}
+.gp-empty .gp-empty-ico{font-size:3rem;margin-bottom:12px}
+
+@media(max-width:680px){
+  .gp-hero{padding:28px 20px 26px}.gp-hero h1{font-size:1.8rem}
+  .gp-hero::after{display:none}
+  .gp-grid{grid-template-columns:1fr}
+  .gp-topbar{padding:0 16px}
+  .gp-search-bar,.gp-cats,.gp-body{padding-left:16px;padding-right:16px}
+}
+</style>
+
+<div class="gp-topbar">
+  <button class="gp-back" onclick="closeGlosario()">← Volver al inicio</button>
+</div>
+
+<div class="gp-hero">
+  <h1>📖 Glosario del Ciclo</h1>
+  <p>Todo el vocabulario que necesitás entender para moverte con confianza en el proceso de aseguramiento de la calidad. En palabras simples, sin tecnicismos innecesarios.</p>
+</div>
+
+<div class="gp-search-bar">
+  <div class="gp-search-inner">
+    <span class="gp-search-icon">🔍</span>
+    <input type="text" id="gpSearch" placeholder="Buscá cualquier término..." oninput="gpFilter()">
+  </div>
+</div>
+
+<div class="gp-cats" id="gpCats">
+  <button class="gp-cat on" data-cat="all" onclick="gpCat(this)">🌐 Todos <span class="gp-cat-count" id="gpCount">0</span></button>
+  <button class="gp-cat" data-cat="proceso" onclick="gpCat(this)">🔄 El Proceso <span class="gp-cat-count">5</span></button>
+  <button class="gp-cat" data-cat="roles" onclick="gpCat(this)">👥 Los Roles <span class="gp-cat-count">5</span></button>
+  <button class="gp-cat" data-cat="documentos" onclick="gpCat(this)">📂 Los Documentos <span class="gp-cat-count">5</span></button>
+  <button class="gp-cat" data-cat="evaluacion" onclick="gpCat(this)">📊 Evaluación <span class="gp-cat-count">5</span></button>
+</div>
+
+<div class="gp-body" id="gpBody">
+
+  <!-- ─── PROCESO ─── -->
+  <div class="gp-section" data-section="proceso">
+    <div class="gp-section-title">
+      <div class="gp-section-ico" style="background:var(--purple-light)">🔄</div>
+      El Proceso
+    </div>
+    <div class="gp-grid">
+
+      <div class="gp-term" data-cat="proceso">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--purple-light)">🔄</div>
+          <div class="gp-term-head"><h3>Assessment</h3><span class="gp-badge proceso">Proceso</span></div>
+        </div>
+        <div class="gp-term-def">Es el proceso de recolectar evidencias del trabajo de los estudiantes para saber si el programa está realmente desarrollando las competencias que promete. No es una nota: no califica al estudiante, califica al programa.</div>
+        <div class="gp-tip">💡 Pensalo así: el assessment responde la pregunta "¿estamos enseñando bien lo que decimos que enseñamos?"</div>
+        <div class="gp-analogy"><span class="gp-analogy-ico">🏥</span><div>Es como los chequeos médicos periódicos de un programa: te dicen si todo está funcionando bien, y si no, dónde hay que mejorar.</div></div>
+      </div>
+
+      <div class="gp-term" data-cat="proceso">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--purple-light)">🔁</div>
+          <div class="gp-term-head"><h3>Ciclo de Mejoramiento Continuo</h3><span class="gp-badge proceso">Proceso</span></div>
+        </div>
+        <div class="gp-term-def">Las 4 fases que se repiten una y otra vez: Planeación → Assessment → Evaluación → Mejora. Cada ciclo completo tarda entre 3 y 4 semestres. La idea es que cada ciclo el programa aprenda y mejore.</div>
+        <div class="gp-tip">💡 No es un proceso de una sola vez. Es continuo, como la mejora constante en cualquier organización.</div>
+      </div>
+
+      <div class="gp-term" data-cat="proceso">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--purple-light)">📍</div>
+          <div class="gp-term-head"><h3>Curso Fuente de Assessment</h3><span class="gp-badge proceso">Proceso</span></div>
+        </div>
+        <div class="gp-term-def">Es el curso donde se recolectan las evidencias del estudiante para el assessment. Según la nueva versión de la matriz, hay dos tipos: <strong>T = Assessment Formativo</strong> (el curso participa en la recolección durante el proceso) y <strong>A = Assessment Sumativo</strong> (el curso es la fuente principal, evalúa el logro final). Ambos tipos implican que tenés que aplicar la rúbrica y entregar muestras. La Matriz de Cruce define cuáles cursos son fuente.</div>
+        <div class="gp-tip orange">⚠️ Si tu curso tiene T o A en la matriz, sos fuente de assessment. La diferencia: T es seguimiento del proceso, A es evaluación del logro final.</div>
+      </div>
+
+      <div class="gp-term" data-cat="proceso">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--purple-light)">🛤️</div>
+          <div class="gp-term-head"><h3>Ruta de Desarrollo de la Competencia</h3><span class="gp-badge proceso">Proceso</span></div>
+        </div>
+        <div class="gp-term-def">El camino que recorre una competencia a lo largo del plan de estudios: primero se introduce en un curso, luego se trabaja en varios, y finalmente se evalúa. Se extrae de la Matriz de Cruce y muestra el recorrido completo.</div>
+        <div class="gp-tip">💡 Como un camino de aprendizaje: primero conocés el concepto, luego lo practicás, y al final lo demostrás.</div>
+      </div>
+
+      <div class="gp-term" data-cat="proceso">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--purple-light)">📎</div>
+          <div class="gp-term-head"><h3>Muestra de Evidencias</h3><span class="gp-badge proceso">Proceso</span></div>
+        </div>
+        <div class="gp-term-def">Un conjunto pequeño pero representativo de trabajos estudiantiles seleccionados para el análisis. Se eligen 3 a 6 trabajos que representen distintos niveles: uno de alto desempeño, uno medio y uno bajo. No se revisan todos los trabajos del curso.</div>
+        <div class="gp-tip">💡 Es una muestra estadística: no necesitás ver todos los trabajos para entender cómo le fue al grupo.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── ROLES ─── -->
+  <div class="gp-section" data-section="roles">
+    <div class="gp-section-title">
+      <div class="gp-section-ico" style="background:var(--orange-light)">👥</div>
+      Los Roles
+    </div>
+    <div class="gp-grid">
+
+      <div class="gp-term" data-cat="roles">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--orange-light)">🧑‍🏫</div>
+          <div class="gp-term-head"><h3>Líder de Competencia</h3><span class="gp-badge roles">Rol</span></div>
+        </div>
+        <div class="gp-term-def">El profesor responsable de coordinar todo el ciclo de assessment para una competencia específica. Arma el Plan de Assessment, organiza la recolección de evidencias, analiza los resultados y presenta los hallazgos al comité para decidir cómo mejorar.</div>
+        <div class="gp-tip orange">💡 Es como el "director técnico" de esa competencia: no necesariamente la enseña en todos los cursos, pero sí se asegura de que se esté desarrollando bien en todo el programa.</div>
+      </div>
+
+      <div class="gp-term" data-cat="roles">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--orange-light)">🧩</div>
+          <div class="gp-term-head"><h3>Líder de Bloque</h3><span class="gp-badge roles">Rol</span></div>
+        </div>
+        <div class="gp-term-def">El profesor que coordina un grupo de cursos relacionados dentro del programa (un bloque temático). En la fase de Mejora, es quien implementa las acciones que afectan varios cursos de su área. Actúa como puente entre el líder de competencia y los profes de su bloque.</div>
+        <div class="gp-tip orange">💡 Si el líder de competencia es el director técnico, el líder de bloque es el coordinador del área de defensa o ataque.</div>
+      </div>
+
+      <div class="gp-term" data-cat="roles">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--orange-light)">🏢</div>
+          <div class="gp-term-head"><h3>Oficina MECA</h3><span class="gp-badge roles">Rol</span></div>
+        </div>
+        <div class="gp-term-def">La Oficina de Mejoramiento Continuo Académico. Es el equipo de soporte de todo el proceso: acompaña a los líderes, procesa los datos del assessment, genera el Draft Report y hace seguimiento para que el ciclo se ejecute bien en toda la facultad.</div>
+        <div class="gp-tip orange">💡 MECA no evalúa a los profes ni al programa para "ponerles una nota". Es un aliado que te ayuda a ver los datos y tomar mejores decisiones.</div>
+      </div>
+
+      <div class="gp-term" data-cat="roles">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--orange-light)">🏛️</div>
+          <div class="gp-term-head"><h3>Comité CAE</h3><span class="gp-badge roles">Rol</span></div>
+        </div>
+        <div class="gp-term-def">El Comité de Assessment y Evaluación. Es el grupo que se reúne para revisar los resultados del assessment, validar los informes y decidir qué acciones de mejora se van a implementar. Lo conforman el Director del programa, Jefes de Departamento, Líderes de Competencia y la Directora MECA.</div>
+        <div class="gp-tip orange">💡 No se reúne todo el tiempo: se convoca en momentos clave del ciclo, principalmente al final de la fase de Evaluación.</div>
+      </div>
+
+      <div class="gp-term" data-cat="roles">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--orange-light)">🎓</div>
+          <div class="gp-term-head"><h3>Director de Programa</h3><span class="gp-badge roles">Rol</span></div>
+        </div>
+        <div class="gp-term-def">El responsable académico del programa. Lidera el Comité CAE, toma decisiones de mejora a nivel global del currículo y conecta los resultados del assessment con los procesos de registro calificado y acreditación institucional.</div>
+        <div class="gp-tip orange">💡 Es quien tiene la visión completa del programa y puede hacer cambios curriculares estructurales cuando el assessment lo indica.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── DOCUMENTOS ─── -->
+  <div class="gp-section" data-section="documentos">
+    <div class="gp-section-title">
+      <div class="gp-section-ico" style="background:#F5FFD0">📂</div>
+      Los Documentos
+    </div>
+    <div class="gp-grid">
+
+      <div class="gp-term" data-cat="documentos">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:#F5FFD0">🗺️</div>
+          <div class="gp-term-head"><h3>Matriz de Cruce Curricular</h3><span class="gp-badge documentos">Documento</span></div>
+        </div>
+        <div class="gp-term-def">Una tabla que muestra la relación entre las competencias del programa y los cursos del plan de estudios. Para cada combinación, indica si ese curso Introduce (I), Trabaja (T) o Evalúa (A) la competencia. Nace cuando se diseña el programa y se actualiza si hay cambios curriculares.</div>
+        <div class="gp-tip lime">💡 Es el mapa de ruta de cada competencia: te dice en qué paradas del recorrido académico aparece cada habilidad.</div>
+      </div>
+
+      <div class="gp-term" data-cat="documentos">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:#F5FFD0">📋</div>
+          <div class="gp-term-head"><h3>Plan de Assessment</h3><span class="gp-badge documentos">Documento</span></div>
+        </div>
+        <div class="gp-term-def">El documento que arma el Líder de Competencia al inicio de cada ciclo. Define exactamente qué indicador se va a evaluar, en qué cursos, con qué instrumento, quién es responsable y cuándo. Sin este documento aprobado, no se puede arrancar la recolección.</div>
+        <div class="gp-tip lime">💡 Es el "qué, quién, cómo y cuándo" del assessment. Sin plan, cada profe haría algo diferente y los datos no serían comparables.</div>
+      </div>
+
+      <div class="gp-term" data-cat="documentos">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:#F5FFD0">📊</div>
+          <div class="gp-term-head"><h3>Draft Report</h3><span class="gp-badge documentos">Documento</span></div>
+        </div>
+        <div class="gp-term-def">El primer informe generado por MECA con los datos procesados del assessment. Contiene estadísticas: qué porcentaje de estudiantes llegó a cada nivel de desempeño. No incluye interpretación cualitativa; es el punto de partida para el análisis del Líder de Competencia.</div>
+        <div class="gp-tip lime">💡 Draft Report = los datos crudos. Final Report = la interpretación y las conclusiones. Primero llegan los números, después el análisis.</div>
+      </div>
+
+      <div class="gp-term" data-cat="documentos">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:#F5FFD0">📝</div>
+          <div class="gp-term-head"><h3>Final Report</h3><span class="gp-badge documentos">Documento</span></div>
+        </div>
+        <div class="gp-term-def">El informe final elaborado por el Líder de Competencia a partir del Draft Report. Incluye el análisis de qué está pasando, por qué creen que está pasando y qué proponen hacer. Se presenta ante el Comité CAE para que tome decisiones de mejora.</div>
+        <div class="gp-tip lime">💡 Es el documento más importante del ciclo: convierte los datos en decisiones concretas de mejora.</div>
+      </div>
+
+      <div class="gp-term" data-cat="documentos">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:#F5FFD0">🪞</div>
+          <div class="gp-term-head"><h3>Memo Reflexivo Docente</h3><span class="gp-badge documentos">Documento</span></div>
+        </div>
+        <div class="gp-term-def">Un documento corto que el profe del curso fuente completa al final del semestre. Reflexiona sobre cómo le fue con la competencia en su curso: qué funcionó, qué no funcionó y qué cambiaría. Es fundamental para que el líder entienda el contexto detrás de los números del Draft Report.</div>
+        <div class="gp-tip lime">💡 Es la "voz del profe" en el proceso. Sin este documento, el líder solo tiene números sin contexto.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── EVALUACIÓN ─── -->
+  <div class="gp-section" data-section="evaluacion">
+    <div class="gp-section-title">
+      <div class="gp-section-ico" style="background:var(--green-light)">📊</div>
+      Evaluación y Desempeño
+    </div>
+    <div class="gp-grid">
+
+      <div class="gp-term" data-cat="evaluacion">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--green-light)">🎯</div>
+          <div class="gp-term-head"><h3>Competencia (Student Outcome)</h3><span class="gp-badge evaluacion">Evaluación</span></div>
+        </div>
+        <div class="gp-term-def">Un conjunto de conocimientos, habilidades y actitudes que el estudiante debe haber desarrollado al graduarse. Las competencias son del programa, no de un solo curso: se construyen a lo largo de todo el plan de estudios. Cada programa tiene entre 5 y 12 competencias definidas.</div>
+        <div class="gp-tip green">💡 Una competencia no se aprende en un semestre. Se desarrolla poco a poco a lo largo de toda la carrera, en múltiples cursos y contextos.</div>
+      </div>
+
+      <div class="gp-term" data-cat="evaluacion">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--green-light)">🎯</div>
+          <div class="gp-term-head"><h3>Indicador de Desempeño (PI)</h3><span class="gp-badge evaluacion">Evaluación</span></div>
+        </div>
+        <div class="gp-term-def">Un comportamiento concreto y observable que demuestra que el estudiante está desarrollando la competencia. Cada competencia se descompone en varios PIs (Performance Indicators). En el assessment, se mide uno o dos PIs por ciclo, no la competencia completa.</div>
+        <div class="gp-tip green">💡 La competencia es el destino ("diseñar soluciones de ingeniería"). El PI es una acción observable en el camino ("identifica correctamente los requisitos del cliente").</div>
+      </div>
+
+      <div class="gp-term" data-cat="evaluacion">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--green-light)">📏</div>
+          <div class="gp-term-head"><h3>Rúbrica de Competencia</h3><span class="gp-badge evaluacion">Evaluación</span></div>
+        </div>
+        <div class="gp-term-def">El instrumento que describe con detalle qué se espera del estudiante en cada nivel de desempeño (1 al 4) para un indicador específico. Permite que todos los profes evalúen con los mismos criterios, de forma objetiva y comparable. El nivel 4 es el desempeño sobresaliente esperado al egreso.</div>
+        <div class="gp-tip green">💡 Sin rúbrica, "bueno" significa algo diferente para cada profe. Con rúbrica, todos tienen el mismo criterio y la evaluación es justa.</div>
+      </div>
+
+      <div class="gp-term" data-cat="evaluacion">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--green-light)">🏆</div>
+          <div class="gp-term-head"><h3>Niveles de Standing</h3><span class="gp-badge evaluacion">Evaluación</span></div>
+        </div>
+        <div class="gp-term-def">La clasificación global del programa en una competencia: Distinguished (sobresaliente), Accomplished (logrado), Developing (en desarrollo) o Beginning (inicial). Se calcula a partir del porcentaje de estudiantes que llegan a cada nivel de la rúbrica. Es del programa, no del estudiante.</div>
+        <div class="gp-tip green">💡 Si el 80% de los estudiantes llega al nivel 3 o 4, el programa está "Accomplished". Si la mayoría está en 1 y 2, hay trabajo por hacer.</div>
+      </div>
+
+      <div class="gp-term" data-cat="evaluacion">
+        <div class="gp-term-top">
+          <div class="gp-term-ico" style="background:var(--green-light)">🚀</div>
+          <div class="gp-term-head"><h3>Acción de Mejora</h3><span class="gp-badge evaluacion">Evaluación</span></div>
+        </div>
+        <div class="gp-term-def">Una intervención concreta que el programa implementa para cerrar una brecha de desempeño identificada en el assessment. Puede ser pequeña (ajustar una actividad en un curso) o grande (cambiar el orden de los cursos en el plan de estudios). Cada acción tiene responsable, plazo y forma de verificar si funcionó.</div>
+        <div class="gp-tip green">💡 Una acción de mejora sin responsable ni plazo no es una acción, es un deseo. Para que funcione, alguien tiene que ser dueño de hacerla pasar.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="gp-empty hidden" id="gpEmpty">
+    <div class="gp-empty-ico">🔍</div>
+    <p>No encontré términos con esa búsqueda.</p>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── SCROLL ANIMATIONS ──
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.15});
+document.querySelectorAll('.tl-item').forEach(el=>obs.observe(el));
+
+const heroGrads={
+  planeacion:'linear-gradient(135deg,#EDE9FF 0%,#F5F0FF 60%,#fff 100%)',
+  assessment:'linear-gradient(135deg,#FFE8DF 0%,#FFF3EE 60%,#fff 100%)',
+  evaluacion:'linear-gradient(135deg,#F5FFD0 0%,#FAFFF0 60%,#fff 100%)',
+  mejora:'linear-gradient(135deg,#CFFAEB 0%,#EDFFF7 60%,#fff 100%)'
+};
+const heroColors={planeacion:'var(--purple)',assessment:'var(--orange)',evaluacion:'var(--lime-dark)',mejora:'var(--green)'};
+
+const PH={
+planeacion:{sem:'Semestre 1 · Enero – Febrero',title:'Planeación',
+sub:'Antes de medir, hay que preparar. Revisa la Matriz de Cruce, construye el Plan de Assessment, ajusta la rúbrica y compártela con los profes. ¡Acá te explicamos todo paso a paso!',
+months:['Enero','Febrero'],html:`
+<style>
+/* ── MATRIX STYLES ── */
+.matrix-wrap{background:var(--white);border-radius:20px;box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:20px}
+.matrix-header{background:linear-gradient(135deg,var(--purple),#9B8FFF);padding:22px 28px 18px;color:white}
+.matrix-header h3{font-family:'Fredoka One',cursive;font-size:1.4rem;margin-bottom:4px}
+.matrix-header p{font-size:.82rem;opacity:.8;font-weight:600}
+.matrix-body{padding:24px 28px}
+.matrix-intro{font-size:.84rem;color:var(--muted);line-height:1.7;margin-bottom:20px;
+  background:var(--purple-light);border-radius:12px;padding:14px 18px;
+  border-left:4px solid var(--purple)}
+.matrix-intro strong{color:var(--purple)}
+
+/* Table */
+.mx-table-wrap{overflow-x:auto;border-radius:14px;border:2px solid var(--bg2)}
+.mx-table{width:100%;border-collapse:collapse;min-width:520px}
+.mx-table th{padding:12px 16px;font-size:.72rem;font-weight:900;text-align:center;
+  border-bottom:2px solid var(--bg2)}
+.mx-table td{padding:14px 16px;font-size:.8rem;border-bottom:1px solid var(--bg);
+  vertical-align:middle}
+.mx-table tr:last-child td{border-bottom:none}
+.mx-th-courses{background:var(--dark);color:white;text-align:left!important;width:200px}
+.mx-th-comp{background:var(--purple);color:white}
+.mx-course-cell{display:flex;align-items:center;gap:10px}
+.mx-course-ico{width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.mx-course-name{font-weight:800;color:var(--dark);font-size:.79rem;line-height:1.3}
+.mx-course-sub{font-size:.68rem;color:var(--muted);font-weight:600}
+.mx-cell{text-align:center}
+.mx-badge{display:inline-flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 12px;border-radius:10px;font-weight:900;line-height:1}
+.mx-badge .mx-letter{font-family:'Fredoka One',cursive;font-size:1.4rem}
+.mx-badge .mx-word{font-size:.6rem;font-weight:800;opacity:.8}
+.mx-I .mx-badge{background:#FFF8E0;color:#D4A000}
+.mx-T .mx-badge{background:#E0F2FF;color:#2196C9}
+.mx-A .mx-badge{background:#E8F7F2;color:#00915A}
+.mx-TA .mx-badge{background:linear-gradient(135deg,#E0F2FF,#E8F7F2);color:#00915A;border:2px solid rgba(0,145,90,.2)}
+.mx-empty{color:var(--muted);font-size:1.2rem;opacity:.3}
+.mx-source-row{background:rgba(255,230,200,.2)}
+.mx-source-badge{
+  display:inline-block;background:var(--orange);color:white;
+  font-size:.6rem;font-weight:900;padding:2px 8px;border-radius:50px;
+  margin-left:6px;vertical-align:middle;
+}
+/* Legend */
+.mx-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.mx-leg-item{display:flex;align-items:center;gap:8px;
+  background:var(--bg);border-radius:10px;padding:8px 14px;flex:1;min-width:140px}
+.mx-leg-letter{font-family:'Fredoka One',cursive;font-size:1.2rem;font-weight:900;width:24px;text-align:center}
+.mx-leg-text strong{font-size:.75rem;color:var(--dark);display:block}
+.mx-leg-text span{font-size:.68rem;color:var(--muted)}
+.mx-source-note{
+  display:flex;align-items:center;gap:10px;
+  margin-top:14px;background:var(--orange-light);
+  border-radius:12px;padding:12px 16px;
+  border-left:4px solid var(--orange);
+}
+.mx-source-note .star{font-size:18px}
+.mx-source-note p{font-size:.78rem;color:var(--text);font-weight:700;line-height:1.5}
+.mx-source-note strong{color:var(--orange)}
+
+/* Docs links */
+.docs-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.doc-card{background:var(--white);border:2px solid var(--bg2);border-radius:16px;
+  padding:18px 16px;text-decoration:none;color:var(--text);
+  transition:all .2s;display:flex;flex-direction:column;gap:8px}
+.doc-card:hover{border-color:var(--purple);box-shadow:var(--card-shadow);transform:translateY(-3px)}
+.doc-ico-wrap{width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:20px}
+.doc-card h4{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--dark)}
+.doc-card p{font-size:.73rem;color:var(--muted);line-height:1.4}
+.doc-cta{font-size:.7rem;font-weight:900;display:flex;align-items:center;gap:5px;margin-top:2px}
+@media(max-width:620px){.docs-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="step-ctx">
+<div class="ctx-h p1"><div class="ctx-label"><div class="ctx-ico"><span>⚙️</span></div>Qué hacés en este paso</div>
+<h4>Prepararte antes de empezar a medir</h4>
+<p>En enero mirás la Matriz de Cruce de tu programa para saber cuáles son los cursos que trabajan o evalúan tu competencia. Con eso armás el Plan de Assessment, revisás la rúbrica y en febrero la compartís con los profes de esos cursos.</p>
+<div class="del-tag"><span>📋 Plan de Assessment + Rúbrica lista</span></div></div>
+<div class="ctx-h p1"><div class="ctx-label"><div class="ctx-ico"><span>🎯</span></div>Qué tenés que tener listo al final</div>
+<h4>Todo el mundo sabe qué medir y cómo</h4>
+<ul>
+<li>El Plan de Assessment está completo y aprobado.</li>
+<li>Los profes de los cursos fuente conocen la rúbrica y los indicadores.</li>
+<li>El calendario de recolección está acordado.</li>
+<li>Ningún profe tiene dudas de si su curso participa o no.</li>
+</ul></div>
+</div>
+
+<div class="sec-title">🗺️ La Matriz de Cruce — ¿qué es y cómo te afecta?</div>
+
+<div class="matrix-wrap">
+  <div class="matrix-header">
+    <h3>Matriz de Cruce — Ejemplo Simplificado</h3>
+    <p>Muestra en qué cursos se presenta, se trabaja y se evalúa cada competencia</p>
+  </div>
+  <div class="matrix-body">
+    <div class="matrix-intro">
+      Cada programa tiene esta matriz. Acá podés ver el <strong>recorrido de tu competencia</strong> a lo largo del plan de estudios: en qué semestres aparece, y qué cursos son los responsables de medirla. Los cursos marcados con <strong style="color:var(--green)">A</strong> o <strong style="color:#2196C9">T&A</strong> son los que tienen que recolectar evidencias — esos son tus <strong>cursos fuente de assessment</strong>.
+    </div>
+
+    <div class="mx-table-wrap">
+    <table class="mx-table">
+      <thead>
+        <tr>
+          <th class="mx-th-courses">CURSOS</th>
+          <th class="mx-th-comp" colspan="3">COMPETENCIAS (Performance Indicators)</th>
+        </tr>
+        <tr>
+          <th class="mx-th-courses" style="background:#1a1650;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.7)">Tu programa tiene su propia matriz</th>
+          <th style="background:#EDE9FF;color:var(--purple);font-size:.72rem;padding:10px">PI1 · Identificar y formular problemas complejos</th>
+          <th style="background:#EDE9FF;color:var(--purple);font-size:.72rem;padding:10px">PI2 · Resolver problemas aplicando principios</th>
+          <th style="background:#EDE9FF;color:var(--purple);font-size:.72rem;padding:10px">PI3 · Diseñar soluciones considerando requisitos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#FFF8E0">💡</div><div><div class="mx-course-name">Curso 1</div><div class="mx-course-sub">Intro a la Ingeniería</div></div></div></td>
+          <td class="mx-cell mx-I"><div class="mx-badge"><span class="mx-letter">I</span><span class="mx-word">Introduce</span></div></td>
+          <td class="mx-cell mx-empty">—</td>
+          <td class="mx-cell mx-empty">—</td>
+        </tr>
+        <tr>
+          <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#E0F2FF">💻</div><div><div class="mx-course-name">Curso 2</div><div class="mx-course-sub">Programación I</div></div></div></td>
+          <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Trabaja</span></div></td>
+          <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Trabaja</span></div></td>
+          <td class="mx-cell mx-empty">—</td>
+        </tr>
+        <tr>
+          <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#E8F7F2">⚙️</div><div><div class="mx-course-name">Curso 3</div><div class="mx-course-sub">Ingeniería de Software I</div></div></div></td>
+          <td class="mx-cell mx-empty">—</td>
+          <td class="mx-cell mx-T"><div class="mx-badge"><span class="mx-letter">T</span><span class="mx-word">Trabaja</span></div></td>
+          <td class="mx-cell mx-empty">—</td>
+        </tr>
+        <tr class="mx-source-row">
+          <td><div class="mx-course-cell"><div class="mx-course-ico" style="background:#F0EBF8">📊</div><div><div class="mx-course-name">Curso 4 <span class="mx-source-badge">Fuente</span></div><div class="mx-course-sub">Proyecto Integrador</div></div></div></td>
+          <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Evalúa</span></div></td>
+          <td class="mx-cell mx-A"><div class="mx-badge"><span class="mx-letter">A</span><span class="mx-word">Evalúa</span></div></td>
+          <td class="mx-cell mx-TA"><div class="mx-badge"><span class="mx-letter" style="font-size:1.1rem">T&A</span><span class="mx-word">Trabaja y evalúa</span></div></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="mx-legend">
+      <div class="mx-leg-item"><div class="mx-leg-letter" style="color:#D4A000">I</div><div class="mx-leg-text"><strong>I = Introduce</strong><span>La competencia aparece por primera vez en este curso</span></div></div>
+      <div class="mx-leg-item"><div class="mx-leg-letter" style="color:#2196C9">T</div><div class="mx-leg-text"><strong>T = Assessment Formativo</strong><span>El curso desarrolla la competencia y recolecta evidencias de forma parcial</span></div></div>
+      <div class="mx-leg-item"><div class="mx-leg-letter" style="color:#00915A">A</div><div class="mx-leg-text"><strong>A = Evalúa</strong><span>Este curso es fuente de assessment — recolecta evidencias</span></div></div>
+    </div>
+
+    <div class="mx-source-note">
+      <span class="star">⭐</span>
+      <p>Los cursos con <strong>A</strong> o <strong>T&A</strong> son tus cursos fuente. Son los que tienen que aplicar la rúbrica y entregarte muestras de trabajo estudiantil para el assessment.</p>
+    </div>
+  </div>
+</div>
+
+<div class="sec-title">📂 Documentos de referencia — ejemplos reales</div>
+
+<div class="docs-grid">
+  <a class="doc-card" href="https://icesiedu.sharepoint.com/:x:/r/sites/facultad-ingenieria/gestion-curricular/_layouts/15/Doc.aspx?sourcedoc=%7B5847D0E2-E0FE-4335-B4AD-AE4DCB1495CE%7D&file=Matriz%20SIS-PI%20-Out2.xlsx&action=default&mobileredirect=true" target="_blank">
+    <div class="doc-ico-wrap" style="background:#EDE9FF">🗺️</div>
+    <h4>Matriz de Cruce</h4>
+    <p>Ejemplo real de la Matriz SIS-PI del programa. Mirá cómo están mapeadas las competencias en cada curso.</p>
+    <div class="doc-cta" style="color:var(--purple)">Ver ejemplo real →</div>
+  </a>
+  <a class="doc-card" href="https://icesiedu.sharepoint.com/:w:/r/sites/facultad-ingenieria/gestion-curricular/_layouts/15/Doc.aspx?sourcedoc=%7BC9A6BBE5-8DDD-42B3-946C-0586520A242E%7D&file=SSE-AssessmentPlan_SO2_Cycle%203.0%20%20MMROJAS.docx&action=default&mobileredirect=true" target="_blank">
+    <div class="doc-ico-wrap" style="background:var(--orange-light)">📋</div>
+    <h4>Plan de Assessment</h4>
+    <p>Ejemplo completo de un Plan de Assessment real. Usalo como guía para armar el tuyo para el próximo ciclo.</p>
+    <div class="doc-cta" style="color:var(--orange)">Ver ejemplo real →</div>
+  </a>
+  <a class="doc-card" href="https://icesiedu.sharepoint.com/:x:/r/sites/facultad-ingenieria/gestion-curricular/_layouts/15/Doc.aspx?sourcedoc=%7B71F23B83-D1C9-4BAE-A68A-4ADDDB58C474%7D&file=RubricsSSE-Outcome2-Cycle2.2.xlsx&action=default&mobileredirect=true" target="_blank">
+    <div class="doc-ico-wrap" style="background:var(--green-light)">📏</div>
+    <h4>Rúbrica de Competencia</h4>
+    <p>Ejemplo de una rúbrica real con los niveles de desempeño (1 al 4) para cada indicador. Revisala con tus profes fuente.</p>
+    <div class="doc-cta" style="color:var(--green)">Ver ejemplo real →</div>
+  </a>
+</div>
+
+<div class="sec-title">👥 ¿Quién hace qué en Planeación?</div>
+<div class="roles-c" style="margin-top:0">
+<h3 style="display:none"></h3>
+<div class="rr"><div class="rav">🧑‍🏫</div><div class="ri"><strong>Vos — Líder de Competencia</strong><span>Revisás la Matriz de Cruce, armás el Plan de Assessment y compartís la rúbrica con los profes de los cursos fuente.</span></div></div>
+<div class="rr"><div class="rav">📋</div><div class="ri"><strong>Comité CAE <span class="r-opt">Opcional</span></strong><span>Si se convoca, revisa y aprueba el plan. No siempre ocurre en esta fase, pero es lo ideal.</span></div></div>
+<div class="rr"><div class="rav">🎓</div><div class="ri"><strong>Director de Programa</strong><span>Asegura que la planeación esté alineada con el perfil de egreso del programa.</span></div></div>
+<div class="rr"><div class="rav">🏢</div><div class="ri"><strong>Oficina MECA</strong><span>Está para acompañarte. Hace seguimiento y te avisa si falta algo antes de arrancar la recolección.</span></div></div>
+</div>`},
+mejora:{sem:'Semestres 3–4 · Enero – Agosto',title:'Mejora Continua',
+sub:'Los profes y líderes de bloque implementan las acciones del CAE. El líder hace seguimiento periódico y documenta el impacto para alimentar el siguiente ciclo.',
+months:['Ene','Feb','Mar','Abr','May','Jun','Ago'],html:`
+<div class="step-ctx">
+<div class="ctx-h p4"><div class="ctx-label"><div class="ctx-ico"><span>⚙️</span></div>Qué se hace en este paso</div><h4>Ejecutar y hacer seguimiento</h4><p>Profes y líderes de bloque implementan las acciones definidas por el CAE: ajustan actividades evaluativas, refuerzan contenidos, hacen jornadas de reflexión. El líder documenta el impacto al cerrar el ciclo.</p><div class="del-tag"><span>🚀 Registro de avance + cierre del ciclo</span></div></div>
+<div class="ctx-h p4"><div class="ctx-label"><div class="ctx-ico"><span>🎯</span></div>Qué se espera al finalizar</div><h4>Evidencia de cambio real</h4><ul><li>Las acciones de mejora se implementaron según el plan.</li><li>Hay registro documentado del avance de cada acción.</li><li>Los profes reportaron resultados en su memo reflexivo.</li><li>El ciclo queda cerrado y el programa está listo para el siguiente.</li></ul></div>
+</div>
+<div class="sec-title">✅ Simulador de Plan de Mejora</div>
+<div class="check-c"><div class="check-hdr" style="background:var(--green)"><span style="font-size:21px">✅</span><div><h3>Simulador de Plan de Mejora</h3><p>Selecciona un problema y ve qué acciones corresponden</p></div></div>
+<div class="scsel"><p>¿Qué problema arrojó el assessment?</p><div class="scbtns">
+<button class="scbtn" onclick="pickSc(0,this)">😟 Estudiantes no alcanzan nivel 3</button>
+<button class="scbtn" onclick="pickSc(1,this)">📋 Rúbrica no alineada</button>
+<button class="scbtn" onclick="pickSc(2,this)">📉 Datos incompletos</button>
+</div></div>
+<div class="scres" id="sr0"><div class="aclist">
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Revisar actividades evaluativas de los cursos fuente</strong><span>Diseñar actividades que exijan evidenciar la competencia en nivel 3 o 4.</span><div class="acwho">👤 Líder de Bloque + Profes</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Capacitación docente en la competencia y su rúbrica</strong><span>Jornada de reflexión donde el líder comparte resultados y discute estrategias.</span><div class="acwho">👤 Líder de Competencia + Jefe de Depto.</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Reforzar el desarrollo en cursos previos</strong><span>Revisar la ruta de desarrollo para asegurar suficiente exposición antes del assessment.</span><div class="acwho">👤 Director + Comité Currículo</div></div></div>
+</div></div>
+<div class="scres" id="sr1"><div class="aclist">
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Taller de revisión de rúbrica con profes fuente</strong><span>Sesión colaborativa para que los descriptores reflejen lo que realmente se puede evidenciar.</span><div class="acwho">👤 Líder de Competencia</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Actualizar Plan de Assessment y Matriz de Cruce</strong><span>Revisar si los cursos fuente son los más adecuados para evidenciar la competencia.</span><div class="acwho">👤 Líder de Competencia + Director</div></div></div>
+</div></div>
+<div class="scres" id="sr2"><div class="aclist">
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Comunicación directa con profes que no entregaron muestras</strong><span>El jefe de departamento garantiza que los planes incluyan actividades de assessment.</span><div class="acwho">👤 Jefe de Departamento</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Reforzar socialización del proceso al inicio del semestre</strong><span>Sesión informativa clara sobre qué entregar, cuándo y en qué formato.</span><div class="acwho">👤 Líder de Competencia</div></div></div>
+<div class="acitem" onclick="this.classList.toggle('done')"><div class="acchk">✓</div><div class="acinfo"><strong>Calendario visual con fechas clave del ciclo</strong><span>Recordatorio institucional automático para los profes fuente.</span><div class="acwho">👤 Directora MECA + Director</div></div></div>
+</div></div>
+</div>
+<div class="roles-c" style="margin-top:14px"><h3>👥 ¿Quién hace qué en Mejora?</h3>
+<div class="rr"><div class="rav">🧩</div><div class="ri"><strong>Líder de Bloque</strong><span>Coordina mejoras que impactan varios cursos. Lidera jornadas de reflexión docente.</span></div></div>
+<div class="rr"><div class="rav">🧑‍🏫</div><div class="ri"><strong>Profe del curso</strong><span>Implementa las acciones asignadas y reporta resultados via memo reflexivo.</span></div></div>
+<div class="rr"><div class="rav">🎓</div><div class="ri"><strong>Director de Programa</strong><span>Lidera el seguimiento macro y conecta resultados con decisiones de acreditación.</span></div></div>
+</div>`}
+};
+
+let curFlow=null,curSc=null;
+// ── GLOSARIO PAGE ──
+function openGlosario(){
+  document.getElementById('view-timeline').classList.remove('active');
+  document.getElementById('view-detail').classList.remove('active');
+  document.getElementById('view-glosario').classList.add('active');
+  window.scrollTo(0,0);
+  gpUpdateCount();
+}
+function closeGlosario(){
+  document.getElementById('view-glosario').classList.remove('active');
+  document.getElementById('view-timeline').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+let gpActiveCat='all';
+function gpCat(btn){
+  gpActiveCat=btn.dataset.cat;
+  document.querySelectorAll('.gp-cat').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  gpFilter();
+}
+function gpFilter(){
+  const q=document.getElementById('gpSearch').value.toLowerCase().trim();
+  let visible=0;
+  document.querySelectorAll('.gp-term').forEach(t=>{
+    const catMatch=gpActiveCat==='all'||t.dataset.cat===gpActiveCat;
+    const textMatch=q===''||t.textContent.toLowerCase().includes(q);
+    const show=catMatch&&textMatch;
+    t.classList.toggle('hidden',!show);
+    if(show)visible++;
+  });
+  // Show/hide sections
+  document.querySelectorAll('.gp-section').forEach(s=>{
+    const visInSection=s.querySelectorAll('.gp-term:not(.hidden)').length;
+    s.style.display=visInSection>0?'block':'none';
+  });
+  document.getElementById('gpEmpty').classList.toggle('hidden',visible>0);
+  gpUpdateCount();
+}
+function gpUpdateCount(){
+  const total=document.querySelectorAll('.gp-term:not(.hidden)').length;
+  document.getElementById('gpCount').textContent=total;
+}
+gpUpdateCount();
+</script>
+</body>
+</html>
